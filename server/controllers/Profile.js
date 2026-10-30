@@ -2,9 +2,9 @@ const Profile = require("../models/Profile");
 const User = require("../models/User");
 const { uploadToCloudinary } = require("../utils/imageUploads");
 const Course = require("../models/Course");
-const CourseProgress = require("../models/CourseProgress")
 const RatingAndReview = require("../models/RatingAndReview");
 const CourseProgress = require("../models/CourseProgress");
+const { getAuthCookieOptions } = require("../utils/authCookie");
 
 // UPDATE profile details
 exports.updateProfile = async (req, res) => {
@@ -89,7 +89,7 @@ exports.deleteAccount = async (req, res) => {
     await Profile.findByIdAndDelete(user.additionalDetails);
     await User.findByIdAndDelete(userId);
 
-    res.clearCookie("token", { httpOnly: true });
+    res.clearCookie("token", getAuthCookieOptions());
     return res.status(200).json({ success: true, message: "User deleted successfully" });
   } catch (err) {
     console.error(err);

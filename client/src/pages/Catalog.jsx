@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { apiConnector } from "../services/apiConnector";
 import { categoriesEndpoints } from "../services/api";
 import CourseCard from "../components/course/CourseCard";

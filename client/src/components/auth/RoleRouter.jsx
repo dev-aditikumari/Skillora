@@ -9,7 +9,7 @@ const RoleRouter =({allow , children})=>{
 
 
     useEffect(()=>{
-        if(user && !allowed)toast.error("Ypu don't have access to this page");
+        if(user && !allowed)toast.error("You don't have access to this page");
 
     },[user , allowed]);
     if(!user) return <Navigate to='/login' replace/>

@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 exports.createCourse = async (req, res) => {
   try {
     const { courseName, courseDescription, price, category, status } = req.body;
+    const coursePrice = Number(price);
 
     const tags = JSON.parse(req.body.tags);
     const whatYouWillLearn = JSON.parse(req.body.whatYouWillLearn);
@@ -20,6 +21,7 @@ exports.createCourse = async (req, res) => {
 
     if (
       !courseName || !courseDescription || price === undefined || price === "" ||
+      !Number.isFinite(coursePrice) || coursePrice < 0 ||
       !category || !thumbnail || whatYouWillLearn.length === 0
     ) {
       return res.status(400).json({ success: false, message: "All fields are required" });
@@ -37,7 +39,7 @@ exports.createCourse = async (req, res) => {
       courseDescription,
       instructor: req.user.id,
       whatYouWillLearn,
-      price,
+      price: coursePrice,
       tags,
       category,
       instructions,
@@ -77,6 +79,14 @@ exports.createSection = async (req, res) => {
 
     if (course.instructor.toString() !== req.user.id) {
       return res.status(403).json({ success: false, message: "You can only edit your own courses" });
+    }
+
+    if (req.body.price !== undefined) {
+      const price = Number(req.body.price);
+      if (!Number.isFinite(price) || price < 0) {
+        return res.status(400).json({ success: false, message: "Price must be a non-negative number" });
+      }
+      course.price = price;
     }
 
     const newSection = await Section.create({ sectionName });
@@ -311,7 +321,7 @@ exports.editCourse = async (req, res) => {
     }
 
     // Plain fields
-    const plainFields = ["courseName", "courseDescription", "price", "category", "status"];
+    const plainFields = ["courseName", "courseDescription", "category", "status"];
     for (const key of plainFields) {
       if (req.body[key] !== undefined) course[key] = req.body[key];
     }
@@ -399,7 +409,11 @@ exports.getCourseDetails = async (req, res) => {
     }
 
     const course = await Course.findOne({ _id: courseId, status: "Published" })
-      .populate({ path: "instructor", select: "firstName lastName image additionalDetails" , populate:{path:"additionalDetailes"  , select:"about"},})
+      .populate({
+        path: "instructor",
+        select: "firstName lastName image additionalDetails",
+        populate: { path: "additionalDetails", select: "about" },
+      })
       .populate({
         path: "courseContent",
         populate: { path: "subSection", select: "title description timeDuration" },

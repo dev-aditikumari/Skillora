@@ -5,6 +5,7 @@ const Profile = require("../models/Profile");
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const mailSender = require("../utils/mailSender")
+const { getAuthCookieOptions } = require("../utils/authCookie");
 exports.sendOTP = async (req , res)=>{
     try{
         // TODO 1: get email from req.body
@@ -174,7 +175,10 @@ exports.logIn = async(req , res)=>{
 
     user.password = undefined;
 
-    const options = {expires: new Date(Date.now() + 3*24*60*60*1000), httpOnly : true };
+    const options = {
+        ...getAuthCookieOptions(),
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    };
     res.cookie("token", token, options).status(200).json({ success: true, token, user, message: "Logged in successfully" });
 
 }
@@ -260,13 +264,9 @@ if(!user){
 };
 
 exports.logout = async( req , res)=>{
-     // TODO 1: clear the "token" cookie   hint: res.clearCookie(???)
-     
-     res.clearCookie("token",{httpOnly:true})
-  // TODO 2: return 200 { success: true, message: "Logged out successfully" }
+  res.clearCookie("token", getAuthCookieOptions());
   return res.status(200).json({success: true , message: "Logged out successfully"})
 }
-
 
 
 

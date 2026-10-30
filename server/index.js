@@ -48,7 +48,9 @@ const allowedOrigins = (process.env.CLIENT_URL || "")
 app.use(
   cors({
     origin: (origin, callback) => {
-      const isLocalDevelopmentOrigin = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || "");
+      const isLocalDevelopmentOrigin =
+        process.env.NODE_ENV !== "production" &&
+        /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || "");
       if (!origin || isLocalDevelopmentOrigin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }

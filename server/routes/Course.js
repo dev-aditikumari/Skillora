@@ -24,6 +24,7 @@ const {
   getFullCourseDetails,
   markLectureComplete,
   getInstructorStats,
+  getPublishedCourses,
 } = require("../controllers/Course");
 
 // Categories
