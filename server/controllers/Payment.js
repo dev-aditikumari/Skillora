@@ -1,4 +1,4 @@
-const { razorpayInstance } = require("../config/razorpay");
+const { razorpayEnabled, razorpayInstance } = require("../config/razorpay");
 const Course = require("../models/Course");
 const Payment = require("../models/Payment");
 const crypto = require("crypto");
@@ -8,6 +8,13 @@ const mailSender = require("../utils/mailSender");
 
 exports.capturePayment = async (req, res) => {
   try {
+    if (!razorpayEnabled) {
+      return res.status(503).json({
+        success: false,
+        message: "Payments are not configured yet",
+      });
+    }
+
     const { courseId } = req.body;
     if (!courseId) {
       return res.status(400).json({ success: false, message: "Course id is required" });
@@ -63,6 +70,13 @@ exports.capturePayment = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
   try {
+    if (!razorpayEnabled) {
+      return res.status(503).json({
+        success: false,
+        message: "Payments are not configured yet",
+      });
+    }
+
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({ success: false, message: "Payment details are required" });

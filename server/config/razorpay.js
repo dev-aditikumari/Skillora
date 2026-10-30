@@ -1,7 +1,9 @@
 const Razorpay = require("razorpay");
 
-// TODO 1: create and export a Razorpay instance:
-//   new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID, key_secret: process.env.RAZORPAY_KEY_SECRET })
-//   (use exports.razorpayInstance = ..., like your cloudinary config)
-const razorpay = new Razorpay({key_id:process.env.RAZORPAY_KEY_ID , key_secret: process.env.RAZORPAY_KEY_SECRET})
-exports.razorpayInstance = razorpay;
+const { RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET } = process.env;
+const hasRazorpayCredentials = Boolean(RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET);
+
+exports.razorpayEnabled = hasRazorpayCredentials;
+exports.razorpayInstance = hasRazorpayCredentials
+  ? new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET })
+  : null;
