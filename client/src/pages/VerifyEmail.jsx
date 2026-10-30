@@ -1,38 +1,56 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { signUp, sendOtp } from "../services/operations/authAPI";
+import AuthLayout, { inputClass, primaryButton } from "../components/auth/AuthLayout";
 
-import {useState , useEffect} from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import  { signUp, sendOtp } from '../services/operations/authAPI'
 const VerifyEmail = () => {
-    const signupData = useSelector((state)=>state.auth.signupData);
-    const navigate = useNavigate();
-    const [otp , setOtp] = useState("");
-    const dispatch = useDispatch();
-   useEffect(()=>{  
-    if(!signupData){
-        navigate("/signup");
-    }
-    } , [signupData , navigate]);
+  const signupData = useSelector((state) => state.auth.signupData);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [otp, setOtp] = useState("");
 
-    const handleSubmit =(e)=>{
-        e.preventDefault();
-        const {accountType , firstName , lastName , email , password , confirmPassword} = signupData;
-        dispatch(signUp(accountType, firstName , lastName , email , password , confirmPassword , otp , navigate));
-       
-    }
+  useEffect(() => {
+    if (!signupData) navigate("/signup");
+  }, [signupData, navigate]);
+
+  if (!signupData) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { accountType, firstName, lastName, email, password, confirmPassword } = signupData;
+    dispatch(
+      signUp(accountType, firstName, lastName, email, password, confirmPassword, otp, navigate)
+    );
+  };
+
   return (
-    <div>
-        <form onSubmit = {handleSubmit}>
-         <input type="text" className='border p-2 rounded'  value={otp} placeholder='OTP' onChange={(e)=>setOtp(e.target.value)}/>
-         <button type='submit' className='border p-2 rounded'>Submit</button>
-         <button type='button' onClick={()=> dispatch(sendOtp(signupData.email , navigate))}>Resend OTP</button>
+    <AuthLayout
+      title="Verify your email"
+      subtitle={`We sent a code to ${signupData.email}`}
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <input
+          className={`${inputClass} text-center tracking-widest text-lg`}
+          type="text"
+          inputMode="numeric"
+          maxLength={6}
+          value={otp}
+          placeholder="Enter OTP"
+          onChange={(e) => setOtp(e.target.value)}
+          required
+        />
+        <button type="submit" className={primaryButton}>Verify and sign up</button>
+        <button
+          type="button"
+          onClick={() => dispatch(sendOtp(signupData.email, navigate))}
+          className="text-sm text-indigo-600 hover:underline"
+        >
+          Resend OTP
+        </button>
+      </form>
+    </AuthLayout>
+  );
+};
 
-
-        </form>
-      
-    </div>
-  )
-}
-
-export default VerifyEmail
+export default VerifyEmail;

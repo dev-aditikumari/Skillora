@@ -1,26 +1,35 @@
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-// TODO 1: return an <aside className="w-56 border-r p-4 flex flex-col gap-2">
-// TODO 2: inside, two NavLinks:
-//    <NavLink to="/dashboard/my-profile">My Profile</NavLink>
-//    <NavLink to="/dashboard/settings">Settings</NavLink>
-// TODO 3: highlight the current page. NavLink can take a FUNCTION as className:
-//    className={({ isActive }) => isActive ? "bg-indigo-100 text-indigo-700 p-2 rounded" : "p-2 rounded hover:bg-gray-100"}
-
-
-import React from 'react'
+const linkClass = ({ isActive }) =>
+  `whitespace-nowrap p-2 rounded ${
+    isActive ? "bg-indigo-100 text-indigo-700" : "hover:bg-gray-100"
+  }`;
 
 const Sidebar = () => {
+  const user = useSelector((state) => state.profile.user);
+  const isInstructor = user?.accountType === "Instructor";
+  const isStudent = user?.accountType === "Student";
+
   return (
-    <aside className="w-56 border-r p-4 flex flex-col gap-2">
-        <NavLink className={({ isActive }) => isActive ? "bg-indigo-100 text-indigo-700 p-2 rounded" : "p-2 rounded hover:bg-gray-100"} to="/dashboard/my-profile">My Profile</NavLink>
-        <NavLink className={({ isActive }) => isActive ? "bg-indigo-100 text-indigo-700 p-2 rounded" : "p-2 rounded hover:bg-gray-100"} to="/dashboard/settings">Settings</NavLink>
+    <aside className="w-full md:w-56 shrink-0 border-b md:border-b-0 md:border-r p-2 md:p-4 flex flex-row md:flex-col gap-2 overflow-x-auto">
+      <NavLink className={linkClass} to="/dashboard/my-profile">My Profile</NavLink>
 
+      {isStudent && (
+        <NavLink className={linkClass} to="/dashboard/enrolled-courses">Enrolled Courses</NavLink>
+      )}
 
-     
-      
+      {isInstructor && (
+        <>
+          <NavLink className={linkClass} to="/dashboard/instructor">Dashboard</NavLink>
+          <NavLink className={linkClass} to="/dashboard/my-courses">My Courses</NavLink>
+          <NavLink className={linkClass} to="/dashboard/add-course">Add Course</NavLink>
+        </>
+      )}
+
+      <NavLink className={linkClass} to="/dashboard/settings">Settings</NavLink>
     </aside>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

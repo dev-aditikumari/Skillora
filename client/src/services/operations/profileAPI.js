@@ -4,7 +4,7 @@ import { profileEndpoints } from '../api';
 import { setUser } from '../../slices/profileSlice';
 import { setToken } from '../../slices/authSlice';
 
-const {GET_USER_DETAILS_API , UPDATE_PROFILE_API , UPDATE_DISPLAY_PICTURE_API , DELETE_PROFILE_API} = profileEndpoints;
+const {GET_USER_DETAILS_API , UPDATE_PROFILE_API , UPDATE_DISPLAY_PICTURE_API , DELETE_PROFILE_API,GET_ENROLLED_COURSES_API} = profileEndpoints;
 
 // helper: keep Redux and localStorage in sync
 const saveUser = (dispatch , user) =>{
@@ -96,3 +96,15 @@ toast.error(error.response?.data?.message || "Could not able to delete profile")
   }
 
 }
+
+export const fetchEnrolledCourses = async () => {
+  let result = [];
+  try {
+    const response = await apiConnector("GET", GET_ENROLLED_COURSES_API);
+    if (!response.data.success) throw new Error(response.data.message);
+    result = response.data.data;
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Could not fetch enrolled courses");
+  }
+  return result;
+};

@@ -1,84 +1,130 @@
 const path = require("path");
-require("dotenv").config({path: path.join(__dirname, "../.env")});
-const express = require("express")
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
+
+const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const fileUpload = require("express-fileupload");
+
 const database = require("./config/database");
-const {cloudinaryConnect} = require("./config/cloudinary");
-const User = require("./models/User");
-const Course = require("./models/Course");
-const Category = require("./models/Category");
-const Section = require("./models/Section");
-const SubSection = require("./models/SubSection");
-const RatingAndReview = require("./models/RatingAndReview");
-const CourseProgress = require("./models/CourseProgress");
-const OTP = require("./models/OTP");
-const Payment = require("./models/Payment");
-const mailSender = require("./utils/mailSender");
-const otpTemplate = require("./mail/templates/emailVerificationTemplate");
-const app = express();
-const PORT = process.env.PORT || 4000;
-const {uploadToCloudinary} = require("./utils/imageUploads");
+const { cloudinaryConnect } = require("./config/cloudinary");
+
+// Importing the models registers them with Mongoose, which populate() needs
+require("./models/User");
+require("./models/Profile");
+require("./models/Course");
+require("./models/Category");
+require("./models/Section");
+require("./models/SubSection");
+require("./models/RatingAndReview");
+require("./models/CourseProgress");
+require("./models/OTP");
+require("./models/Payment");
+
 const UserRoute = require("./routes/User");
 const ProfileRoute = require("./routes/Profile");
-// middleware
-app.use(express.json());
+const CourseRoute = require("./routes/Course");
+const paymentRoutes = require("./routes/Payment");
+const ratingRoutes = require("./routes/RatingAndReview");
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// Behind a proxy in production (Render), so rate limiting sees the real client IP
+app.set("trust proxy", 1);
+
+// ---------- security and parsing ----------
+app.use(helmet());
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
-app.use(cors({ origin:"http://localhost:5173", credentials: true }));
-app.use(fileUpload({ useTempFiles: true,tempFileDir:"/tmp/"}));
 
+const allowedOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
 
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      const isLocalDevelopmentOrigin = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin || "");
+      if (!origin || isLocalDevelopmentOrigin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origin is not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
 
-// Connections 
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB, for lecture videos
+    abortOnLimit: true,
+  })
+);
+
+// ---------- rate limiting ----------
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests. Please try again later." },
+});
+
+// login, signup, OTP, password reset: strict, stops password guessing and email spam
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts. Please try again in 15 minutes." },
+});
+
+app.use(globalLimiter);
+
+// ---------- connections ----------
 database.connect();
 cloudinaryConnect();
 
-
-// routes
-
-// app.use("/api/v1/auth", useRoutes);
-
-app.use("/api/v1/auth", UserRoute)
+// ---------- routes ----------
+app.use("/api/v1/course", CourseRoute);
+app.use("/api/v1/auth", authLimiter, UserRoute);
 app.use("/api/v1/profile", ProfileRoute);
-app.get("/" , (req, res)=>{
-    res.json({success:true, message:"Skillora server is running"});
+app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/rating", ratingRoutes);
+
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "Skillora server is running" });
 });
-app.get("/health", (req , res)=>{
-    res.json({status:"ok" , time : new Date()});
-})
 
-app.get("/test-otp", async (req, res) => {
-  const otp = await OTP.create({ email: "aditikumari35355@gmail.com", otp: "987654" });
-  res.json({ success: true, saved: otp });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", time: new Date() });
 });
-app.post("/test-upload", async (req, res) => {   // ← add "async" here
-  try {
-    // B goes here: create a variable called file and set it to req.files.image
-   if( !req.files  ||  !req.files.image) {
-   return res.status(400).json({success: false , message: "File not found" });
-   }
-   const file = req.files.image
 
-    // C goes here: create a variable called result and set it to
-    //              await uploadToCloudinary(file, process.env.FOLDER_NAME)
-    const result = await uploadToCloudinary(file , process.env.FOLDER_NAME )
+// ---------- 404 and error handling (always last) ----------
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
 
-    // D goes here: return res.json({ ... }) with success: true and url: result.secure_url
-    return res.json({success: true , url: result.secure_url});
-
-  } catch (err) {
-    // E goes here: console.error(err)
-    //              then return res.status(500).json({ ... }) with success: false and err.message
-    console.error(err);
-    return res.status(500).json({success: false , message: err.message });
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  if (err.message === "Origin is not allowed by CORS") {
+    return res.status(403).json({ success: false, message: "Origin not allowed" });
   }
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ success: false, message: "Invalid JSON in request body" });
+  }
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ success: false, message: "Request body too large" });
+  }
+
+  console.error(err);
+  return res.status(500).json({ success: false, message: "Something went wrong" });
 });
 
-
-app.post("/echo", (req,res)=>{
-    res.json({youSent:req.body});
-});
-
-
-app.listen(PORT ,()=>console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
