@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchFullCourse, markLectureComplete } from "../services/operations/courseAPI";
 import ReviewModal from "../components/course/ReviewModal";
+import Spinner from "../components/common/Spinner";
 
 const ViewCourse = () => {
   const { courseId } = useParams();
@@ -38,7 +39,7 @@ const ViewCourse = () => {
     load();
   }, [courseId, navigate]);
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return <Spinner />;
   if (!course) return null;
 
   const allLectures = course.courseContent.flatMap((s) => s.subSection);
@@ -62,7 +63,7 @@ const ViewCourse = () => {
     setCompleted(updated);
 
     if (allLectures.every((l) => updated.includes(l._id))) {
-      toast.success("Course completed! 🎉");
+      toast.success("Course completed!");
     }
     if (nextLecture) setCurrent(nextLecture);
   };
@@ -73,7 +74,7 @@ const ViewCourse = () => {
       <aside className="w-80 border-r p-4 flex flex-col gap-4 overflow-y-auto">
         <button
           onClick={() => navigate("/dashboard/enrolled-courses")}
-          className="text-left text-indigo-600 hover:underline"
+          className="text-left text-blue-600 hover:underline"
         >
           ← Back to My Courses
         </button>
@@ -82,7 +83,7 @@ const ViewCourse = () => {
           <p className="font-semibold mb-2">{course.courseName}</p>
           <div className="h-2 bg-gray-200 rounded">
             <div
-              className="h-2 bg-indigo-600 rounded"
+              className="h-2 bg-blue-600 rounded"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -94,7 +95,7 @@ const ViewCourse = () => {
         ) : (
           <button
             onClick={() => setShowReview(true)}
-            className="border border-indigo-600 text-indigo-600 px-3 py-1 rounded hover:bg-indigo-50"
+            className="border border-blue-600 text-blue-600 px-3 py-1 rounded hover:bg-blue-50"
           >
             Add Review
           </button>
@@ -108,7 +109,7 @@ const ViewCourse = () => {
                 key={lecture._id}
                 onClick={() => setCurrent(lecture)}
                 className={`w-full text-left flex gap-2 items-center p-2 rounded text-sm ${
-                  lecture._id === current?._id ? "bg-indigo-100" : "hover:bg-gray-100"
+                  lecture._id === current?._id ? "bg-blue-100" : "hover:bg-gray-100"
                 }`}
               >
                 <span>{completed.includes(lecture._id) ? "✓" : "○"}</span>
@@ -138,7 +139,7 @@ const ViewCourse = () => {
             <button
               onClick={handleComplete}
               disabled={isCurrentDone || saving}
-              className="self-start bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50"
+              className="self-start bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
             >
               {isCurrentDone ? "Completed ✓" : "Mark as Complete"}
             </button>

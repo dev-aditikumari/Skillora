@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchInstructorCourses, deleteCourse } from "../../services/operations/courseAPI";
+import Spinner from "../../components/common/Spinner";
+import { plural } from "../../utils/plural";
 
 const MyCourses = () => {
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ const MyCourses = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="max-w-5xl">
@@ -32,7 +34,7 @@ const MyCourses = () => {
         <h1 className="text-2xl font-bold">My Courses</h1>
         <Link
           to="/dashboard/add-course"
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Add Course
         </Link>
@@ -65,7 +67,7 @@ const MyCourses = () => {
             </span>
 
             <p className="w-20">₹{course.price}</p>
-            <p className="w-24 text-sm text-gray-600">{course.courseContent.length} sections</p>
+            <p className="w-24 text-sm text-gray-600">{plural(course.courseContent.length, "section")}</p>
 
             <button
               onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}

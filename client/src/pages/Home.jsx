@@ -1,17 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { apiConnector } from "../services/apiConnector";
 import { categoriesEndpoints } from "../services/api";
 import { fetchPublishedCourses } from "../services/operations/courseAPI";
 import CourseCard from "../components/course/CourseCard";
-import { toSlug } from "../utils/slug";
+import Spinner from "../components/common/Spinner";
 
 const Home = () => {
   const token = useSelector((state) => state.auth.token);
   const [categories, setCategories] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
     const load = async () => {
@@ -21,61 +23,84 @@ const Home = () => {
       } catch (error) {
         console.error("Could not load categories", error);
       }
-      setCourses(await fetchPublishedCourses());
+      setCourses(await fetchPublishedCourses(24));
       setLoading(false);
     };
     load();
   }, []);
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return courses.filter((course) => {
+      const inCategory = activeCategory === "all" || course.category?._id === activeCategory;
+      const matches =
+        !q ||
+        course.courseName.toLowerCase().includes(q) ||
+        course.courseDescription.toLowerCase().includes(q);
+      return inCategory && matches;
+    });
+  }, [courses, query, activeCategory]);
+
   return (
     <main>
-      <section className="px-6 py-16 md:py-24 text-center flex flex-col items-center gap-6 bg-indigo-50">
-        <h1 className="text-4xl md:text-5xl font-bold max-w-3xl">
-          Build your next skill with Skillora
-        </h1>
-        <p className="max-w-2xl text-lg text-gray-600">
-          Learn from instructors at your own pace, track your progress, and put your
-          knowledge into practice.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <Link
-            to={token ? "/dashboard/my-profile" : "/signup"}
-            className="rounded bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700"
-          >
-            {token ? "Go to your dashboard" : "Get started"}
-          </Link>
-          <a href="#courses" className="rounded border bg-white px-5 py-3 font-medium hover:bg-gray-50">
-            Explore courses
-          </a>
+      <section className="bg-blue-600 px-6 py-14 text-white">
+        <div className="mx-auto max-w-6xl">
+          <h1 className="text-3xl font-bold md:text-4xl">Learn new skills online</h1>
+          <p className="mt-2 max-w-xl text-blue-100">
+            Browse courses from our instructors, enroll and track your progress.
+          </p>
+          <div className="mt-6 flex gap-3">
+            <Link
+              to={token ? "/dashboard/my-profile" : "/signup"}
+              className="rounded-md bg-white px-5 py-2 font-medium text-blue-700 hover:bg-blue-50"
+            >
+              {token ? "My dashboard" : "Sign up"}
+            </Link>
+            <a href="#courses" className="rounded-md border border-white px-5 py-2 hover:bg-blue-700">
+              Browse courses
+            </a>
+          </div>
         </div>
       </section>
 
-      {categories.length > 0 && (
-        <section className="max-w-6xl mx-auto px-6 pt-12">
-          <h2 className="text-xl font-semibold mb-4">Browse by category</h2>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <Link
+      <section id="courses" className="mx-auto max-w-6xl px-6 py-10">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-2xl font-bold">All Courses</h2>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search courses"
+            aria-label="Search courses"
+            className="w-full sm:w-72"
+          />
+        </div>
+
+        {categories.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            {[{ _id: "all", name: "All" }, ...categories].map((cat) => (
+              <button
                 key={cat._id}
-                to={`/catalog/${toSlug(cat.name)}`}
-                className="border rounded-full px-4 py-1 hover:bg-gray-50"
+                onClick={() => setActiveCategory(cat._id)}
+                className={`rounded-md border px-3 py-1 text-sm ${
+                  activeCategory === cat._id ? "border-blue-600 bg-blue-600 text-white" : "bg-white hover:bg-gray-100"
+                }`}
               >
                 {cat.name}
-              </Link>
+              </button>
             ))}
           </div>
-        </section>
-      )}
+        )}
 
-      <section id="courses" className="max-w-6xl mx-auto px-6 py-12">
-        <h2 className="text-xl font-semibold mb-4">Latest courses</h2>
         {loading ? (
-          <p className="text-gray-500">Loading...</p>
+          <Spinner />
         ) : courses.length === 0 ? (
-          <p className="text-gray-500">No courses have been published yet</p>
+          <p className="text-gray-500">No courses have been published yet.</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-gray-500">No courses found.</p>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((course) => (
               <CourseCard key={course._id} course={course} />
             ))}
           </div>

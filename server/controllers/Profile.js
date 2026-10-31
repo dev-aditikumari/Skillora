@@ -6,26 +6,16 @@ const RatingAndReview = require("../models/RatingAndReview");
 const CourseProgress = require("../models/CourseProgress");
 const { getAuthCookieOptions } = require("../utils/authCookie");
 
-// UPDATE profile details
 exports.updateProfile = async (req, res) => {
   try {
-    // TODO 1: get dob, about, contactNumber, gender, address, city from req.body
-    //         get the user id from req.user.id  (from auth middleware)
     const {dob , about , contactNumber , gender , address , city} = req.body;
     const user_id = req.user.id;
     const user = await User.findById(user_id);
      if(!user) return res.status(404).json({success: false , message:"User not found"});
     const profile = await Profile.findById(user.additionalDetails);
 
-    // TODO 2: find the user → get user.additionalDetails (the Profile id)
-    //         then find the Profile by that id
-    //         (hint: User.findById, then Profile.findById(user.additionalDetails))
     
    
-
-    // TODO 3: update only the fields that were sent.
-    //         (careful: don't overwrite a field with undefined)
-    //         then: await profile.save();
 
     if(dob !== undefined) profile.dob = dob;
     if(about !== undefined) profile.about = about;
@@ -35,18 +25,15 @@ exports.updateProfile = async (req, res) => {
     if(city !== undefined) profile.city = city;
     await profile.save();
 
-
-    // TODO 4: return 200 with the updated profile
     return res.status(200).json({success: true , message: "Profile updated" , profile});
-  } catch (err) { /* TODO 5 */
+  } catch (err) {
     console.error(err)
 
-return res.status(500).json({success: false , message: "Unable to update profile "})
+return res.status(500).json({success: false , message: "Unable to update the profile"})
 
    }
 };
 
-// DELETE account
 exports.deleteAccount = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -55,7 +42,6 @@ exports.deleteAccount = async (req, res) => {
       return res.status(404).json({ success: false, message: "User does not exist" });
     }
 
-    // An instructor's courses would be left pointing at a deleted user
     if (user.accountType === "Instructor") {
       const courseCount = await Course.countDocuments({ instructor: userId });
       if (courseCount > 0) {
@@ -66,7 +52,6 @@ exports.deleteAccount = async (req, res) => {
       }
     }
 
-    // Remove a student's traces from the courses they joined
     if (user.accountType === "Student") {
       await Course.updateMany(
         { studentsEnrolled: userId },
@@ -96,41 +81,31 @@ exports.deleteAccount = async (req, res) => {
     return res.status(500).json({ success: false, message: "Unable to delete user" });
   }
 };
-// GET the logged-in user's full details
 exports.getAllUserDetails = async (req, res) => {
   try {
-    // TODO 10: User.findById(req.user.id).populate("additionalDetails").exec()
 
     const user =await  User.findById(req.user.id).populate("additionalDetails").exec();
-    return res.status(200).json({success: true , message: "All info of user fetched" , user})
-    //          return 200 with the user (no password! why isn't it there?)
-  } catch (err) { /* TODO 11 */
+    return res.status(200).json({success: true , message: "User details fetched" , user})
+  } catch (err) {
     console.error(err);
 return res.status(500).json({success: false , message: "Unable to fetch user details"})
     
   }
 };
 
-// UPDATE profile picture
 exports.updateDisplayPicture = async (req, res) => {
   try {
-    // TODO 12: guard: no req.files or no req.files.displayPicture → 400
      
      if(!req.files|| !req.files.displayProfile){
-      return res.status(400).json({success: false , message:"Unable to fetch file of user" })
+      return res.status(400).json({success: false , message:"Please choose an image to upload" })
      }
      
      const files = req.files.displayProfile;
-    // TODO 13: upload with your uploadToCloudinary(file, process.env.FOLDER_NAME, 1000, 1000)
-    //          (the last two args are height and quality: your function handles them)
 
     const url = await uploadToCloudinary(files , process.env.FOLDER_NAME , 1000 , 1000);
-    // TODO 14: update the user's `image` with result.secure_url
-    //          hint: User.findByIdAndUpdate(id, { image: ... }, { new: true })
       const updatedUser = await User.findByIdAndUpdate(req.user.id , { image: url.secure_url },{new:true})
-    // TODO 15: return 200 with the updated user
-    return res.status(200).json({success: true , message:"Updated Profile Picture" , user: updatedUser})
-  } catch (err) { /* TODO 16 */ 
+    return res.status(200).json({success: true , message:"Profile picture updated" , user: updatedUser})
+  } catch (err) {
     console.error(err);
     return res.status(500).json({success: false , message :"Unable to update profile picture"})
   }

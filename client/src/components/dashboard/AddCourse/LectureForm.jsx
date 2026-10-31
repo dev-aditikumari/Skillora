@@ -66,7 +66,7 @@ const LectureForm = ({ courseId, sectionId, lecture, onDone, onCancel }) => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-indigo-600 text-white px-4 py-1 rounded disabled:opacity-50"
+          className="bg-blue-600 text-white px-4 py-1 rounded disabled:opacity-50"
         >
           {loading ? "Uploading..." : isEditing ? "Save" : "Add Lecture"}
         </button>

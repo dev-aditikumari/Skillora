@@ -104,7 +104,7 @@ exports.updateSection = async (req, res) => {
   try {
     const { sectionName, sectionId, courseId } = req.body;
     if (!sectionName || !sectionId || !courseId) {
-      return res.status(400).json({ success: false, message: "Missing credentials" });
+      return res.status(400).json({ success: false, message: "Section name and course id are required" });
     }
 
     const course = await Course.findById(courseId);
@@ -563,15 +563,41 @@ exports.getInstructorStats = async (req, res) => {
 };
 
 
+// Card-friendly summary: rating, student count and lecture total on top of the basics
+const toCourseCard = (course) => {
+  const ratings = course.ratingAndReviews || [];
+  const ratingCount = ratings.length;
+  const averageRating = ratingCount
+    ? Math.round((ratings.reduce((sum, r) => sum + r.rating, 0) / ratingCount) * 10) / 10
+    : 0;
+  return {
+    _id: course._id,
+    courseName: course.courseName,
+    courseDescription: course.courseDescription,
+    price: course.price,
+    thumbnail: course.thumbnail,
+    instructor: course.instructor,
+    category: course.category,
+    createdAt: course.createdAt,
+    students: course.studentsEnrolled ? course.studentsEnrolled.length : 0,
+    averageRating,
+    ratingCount,
+  };
+};
+exports.toCourseCard = toCourseCard;
+
 exports.getPublishedCourses = async (req, res) => {
   try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 12, 1), 48);
     const courses = await Course.find({ status: "Published" })
       .sort({ createdAt: -1 })
-      .limit(6)
-      .select("courseName courseDescription price thumbnail instructor")
-      .populate({ path: "instructor", select: "firstName lastName" });
+      .limit(limit)
+      .select("courseName courseDescription price thumbnail instructor category studentsEnrolled ratingAndReviews createdAt")
+      .populate({ path: "instructor", select: "firstName lastName" })
+      .populate({ path: "category", select: "name" })
+      .populate({ path: "ratingAndReviews", select: "rating" });
 
-    return res.status(200).json({ success: true, data: courses });
+    return res.status(200).json({ success: true, data: courses.map(toCourseCard) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: "Could not fetch courses" });

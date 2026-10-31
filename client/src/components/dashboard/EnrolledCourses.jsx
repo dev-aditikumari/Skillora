@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchEnrolledCourses } from "../../services/operations/profileAPI";
+import Spinner from "../../components/common/Spinner";
+import { plural } from "../../utils/plural";
 
 const EnrolledCourses = () => {
   const navigate = useNavigate();
@@ -16,7 +18,7 @@ const EnrolledCourses = () => {
     loadCourses();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="max-w-5xl">
@@ -24,10 +26,10 @@ const EnrolledCourses = () => {
 
       {courses.length === 0 ? (
         <div className="flex flex-col gap-4 items-start">
-          <p className="text-gray-500">You haven't enrolled in any course yet</p>
+          <p className="text-gray-500">You haven't enrolled in any courses yet</p>
           <Link
             to="/"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Browse courses
           </Link>
@@ -55,7 +57,7 @@ const EnrolledCourses = () => {
                 <p className="text-xs text-gray-500 mt-1">
                   by {course.instructor.firstName} {course.instructor.lastName}
                   {" · "}
-                  {totalLectures} lectures
+                  {plural(totalLectures, "lecture")}
                 </p>
                 {totalLectures === 0 ? (
   <p className="text-xs text-gray-400 mt-2">No lectures yet</p>
@@ -63,12 +65,12 @@ const EnrolledCourses = () => {
   <div className="mt-2">
     <div className="h-2 bg-gray-200 rounded w-64">
       <div
-        className="h-2 bg-indigo-600 rounded"
+        className="h-2 bg-blue-600 rounded"
         style={{ width: `${progressPercentage}%` }}
       />
     </div>
     <p className="text-xs text-gray-500 mt-1">
-      {completedLectures} of {totalLectures} lectures · {progressPercentage}%
+      {completedLectures} of {plural(totalLectures, "lecture")} · {progressPercentage}%
     </p>
   </div>
 )}
@@ -77,7 +79,7 @@ const EnrolledCourses = () => {
 
               <button
                 onClick={() => navigate(`/view-course/${course._id}`)}
-                className="bg-indigo-600 text-white px-4 py-2 rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
                {buttonLabel}
               </button>

@@ -40,7 +40,6 @@ exports.createRating = async (req, res) => {
 
     return res.status(201).json({ success: true, message: "Review added", data: newRating });
   } catch (err) {
-    // the unique index catches two requests that arrive at the same moment
     if (err.code === 11000) {
       return res.status(400).json({ success: false, message: "You have already reviewed this course" });
     }

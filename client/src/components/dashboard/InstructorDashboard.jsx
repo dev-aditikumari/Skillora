@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { fetchInstructorStats } from "../../services/operations/courseAPI";
+import Spinner from "../../components/common/Spinner";
 
 const formatMoney = (amount) => `₹${Number(amount).toLocaleString("en-IN")}`;
 
@@ -31,7 +32,7 @@ const BarChart = ({ courses, metric }) => {
             </div>
             <div className="h-3 bg-gray-100 rounded">
               <div
-                className="h-3 bg-indigo-600 rounded"
+                className="h-3 bg-blue-600 rounded"
                 style={{ width: `${width}%` }}
               />
             </div>
@@ -57,7 +58,7 @@ const InstructorDashboard = () => {
     load();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
   if (!stats) return <p className="text-gray-500">Could not load your dashboard</p>;
 
   const { totals, courses } = stats;
@@ -65,7 +66,7 @@ const InstructorDashboard = () => {
   return (
     <div className="max-w-5xl flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold">Hi {user?.firstName} 👋</h1>
+        <h1 className="text-2xl font-bold">Hi {user?.firstName}</h1>
         <p className="text-gray-500">Here is how your courses are doing</p>
       </div>
 
@@ -74,7 +75,7 @@ const InstructorDashboard = () => {
           <p className="text-gray-500">You haven't created any courses yet</p>
           <Link
             to="/dashboard/add-course"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Create your first course
           </Link>
@@ -98,7 +99,7 @@ const InstructorDashboard = () => {
                     onClick={() => setMetric(key)}
                     className={`px-3 py-1 rounded text-sm ${
                       metric === key
-                        ? "bg-indigo-600 text-white"
+                        ? "bg-blue-600 text-white"
                         : "border hover:bg-gray-100"
                     }`}
                   >

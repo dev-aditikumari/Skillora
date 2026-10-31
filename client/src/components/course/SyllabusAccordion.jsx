@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { plural } from "../../utils/plural";
 
 const formatDuration = (seconds) => {
   const total = Math.round(Number(seconds));
@@ -31,7 +32,7 @@ const SyllabusAccordion = ({ sections }) => {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-semibold">Course Content</h2>
-        <button onClick={toggleAll} className="text-indigo-600 text-sm hover:underline">
+        <button onClick={toggleAll} className="text-blue-600 text-sm hover:underline">
           {allOpen ? "Collapse all" : "Expand all"}
         </button>
       </div>
@@ -44,7 +45,7 @@ const SyllabusAccordion = ({ sections }) => {
               className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
             >
               <p className="font-medium">{section.sectionName}</p>
-              <p className="text-sm text-gray-500">{section.subSection.length} lectures</p>
+              <p className="text-sm text-gray-500">{plural(section.subSection.length, "lecture")}</p>
             </div>
 
             {openIds.includes(section._id) && (

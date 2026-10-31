@@ -28,6 +28,10 @@ const Signup = () => {
       toast.error("Passwords do not match");
       return;
     }
+    if (formData.password.length < 8 || !/[A-Za-z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      toast.error("Password must be at least 8 characters with a letter and a number");
+      return;
+    }
     dispatch(setSignUpData({ ...formData, accountType: type }));
     dispatch(sendOtp(formData.email, navigate));
   };
@@ -39,19 +43,19 @@ const Signup = () => {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 hover:underline">Log in</Link>
+          <Link to="/login" className="font-medium text-blue-600 hover:underline">Log in</Link>
         </>
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded">
+        <div className="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1">
           {["Student", "Instructor"].map((role) => (
             <button
               key={role}
               type="button"
               onClick={() => setType(role)}
-              className={`py-1 rounded text-sm ${
-                type === role ? "bg-white shadow font-medium" : "text-gray-500"
+              className={`py-1.5 rounded-md text-sm ${
+                type === role ? "bg-white shadow-sm font-semibold text-blue-700" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               {role}
@@ -68,9 +72,9 @@ const Signup = () => {
 
         <input className={inputClass} type="email" name="email" placeholder="Email"
           value={formData.email} onChange={handleChange} required />
-        <input className={inputClass} type="password" name="password" placeholder="Password"
+        <input className={inputClass} type="password" autoComplete="new-password" name="password" placeholder="Password (8+ chars, letter and number)" minLength={8}
           value={formData.password} onChange={handleChange} required />
-        <input className={inputClass} type="password" name="confirmPassword"
+        <input className={inputClass} type="password" autoComplete="new-password" name="confirmPassword"
           placeholder="Confirm password" value={formData.confirmPassword}
           onChange={handleChange} required />
 

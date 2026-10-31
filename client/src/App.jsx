@@ -1,8 +1,8 @@
-import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
 import Navbar from './components/Navbar'
+import Footer from './components/common/Footer'
 import OpenRouter from './components/auth/OpenRouter'
 import PrivateRouter from './components/auth/PrivateRouter'
 import RoleRouter from './components/auth/RoleRouter'
@@ -26,12 +26,14 @@ import EnrolledCourses from './components/dashboard/EnrolledCourses'
 import EditCourse from './components/dashboard/EditCourse'
 import InstructorDashboard from './components/dashboard/InstructorDashboard'
 import AddCourse from './components/dashboard/AddCourse'
+import AdminDashboard from './components/dashboard/AdminDashboard'
 
 function App() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
 
+      <div className="flex flex-1 flex-col [&>*]:w-full">
       <Routes>
         <Route path="/" element={<Home />} />
 
@@ -52,6 +54,9 @@ function App() {
           <Route path="my-courses" element={<RoleRouter allow={["Instructor"]}><MyCourses /></RoleRouter>} />
           <Route path="add-course" element={<RoleRouter allow={["Instructor"]}><AddCourse /></RoleRouter>} />
           <Route path="edit-course/:courseId" element={<RoleRouter allow={["Instructor"]}><EditCourse /></RoleRouter>} />
+
+          {/* admin only */}
+          <Route path="admin" element={<RoleRouter allow={["Admin"]}><AdminDashboard /></RoleRouter>} />
 
           {/* student only */}
           <Route path="enrolled-courses" element={<RoleRouter allow={["Student"]}><EnrolledCourses /></RoleRouter>} />
@@ -75,9 +80,11 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </div>
 
-      <Toaster />
-    </>
+      <Footer />
+      <Toaster position="top-center" />
+    </div>
   )
 }
 

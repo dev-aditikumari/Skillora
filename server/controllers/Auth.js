@@ -6,158 +6,133 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const mailSender = require("../utils/mailSender")
 const { getAuthCookieOptions } = require("../utils/authCookie");
-exports.sendOTP = async (req , res)=>{
-    try{
-        // TODO 1: get email from req.body
-        const email = req.body.email;
+const OTPTemplate = require("../mail/templates/emailVerificationTemplate");
+const crypto = require("crypto");
 
-    // TODO 2: guard: no email → return 400 "Email is required"
-    if(!email){
-        return res.status(400).json({success: false, message: "Email is required" });
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAX_OTP_ATTEMPTS = 5;
+
+const normalizeEmail = (value) => (typeof value === "string" ? value.trim().toLowerCase() : "");
+
+const isStrongPassword = (password) =>
+  typeof password === "string" && password.length >= 8 && password.length <= 128 &&
+  /[A-Za-z]/.test(password) && /\d/.test(password);
+
+exports.sendOTP = async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({ success: false, message: "Enter a valid email address" });
     }
 
-    // TODO 3: does a user with this email already exist?
-    //         hint: await User.findOne({ ??? })
-    //         if yes → return 409 "User already registered"
-    const UserAlready = await User.findOne({email});
-    if(UserAlready){
-        return res.status(409).json({success: false  , message: "User already registered"});
+    if (await User.findOne({ email })) {
+      return res.status(409).json({ success: false, message: "User already registered" });
     }
 
-    // TODO 4: generate a 6-digit, numbers-only OTP:
-    //   otpGenerator.generate(6, {
-    //     upperCaseAlphabets: ???, lowerCaseAlphabets: ???, specialChars: ???
-    //   })
+    await OTP.deleteMany({ email });
+    const otp = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
+    const record = await OTP.create({ email, otp });
 
-     const otp = otpGenerator.generate(6,{
-        upperCaseAlphabets : null , lowerCaseAlphabets:null , specialChars: null
-    })
+    try {
+      await mailSender(email, "Your Skillora verification code", OTPTemplate(otp));
+    } catch (mailError) {
+      console.error("OTP email failed:", mailError.message);
+      await OTP.deleteOne({ _id: record._id });
+      return res.status(503).json({
+        success: false,
+        message: "We could not send the verification email. Please try again shortly.",
+      });
+    }
 
-    // TODO 5: save it → await OTP.create({ ... })   (this triggers the email!)
-    const optSend = await  OTP.create({email , otp });
-    // TODO 6: return 200 { success: true, message: "OTP sent successfully" }
     return res.status(200).json({ success: true, message: "OTP sent successfully" });
   } catch (err) {
-    // TODO 7: console.error, then return 500 with a clear string message
     console.error(err);
-    return res.status(500).json({ success:false,message:"Unable to generate OTP because of internal issue "})
+    return res.status(500).json({ success: false, message: "Unable to send OTP. Please try again." });
   }
-}
+};
 
-// Client sends { firstName, lastName, email, password, confirmPassword, accountType, otp }
-//   → validate all fields present
-//   → passwords match?
-//   → user already exists?
-//   → find the MOST RECENT OTP for this email
-//   → OTP matches?
-//   → hash the password (bcrypt)
-//   → create an empty Profile
-//   → create the User (linking additionalDetails → profile._id)
-//   → respond 201
+exports.signUp = async (req, res) => {
+  try {
+    const { firstName, lastName, password, confirmPassword, accountType, otp } = req.body;
+    const email = normalizeEmail(req.body.email);
 
-
-exports.signUp = async (req , res)=>{
-   try{
-    // TODO 1: destructure from req.body:
-    //   firstName, lastName, email, password, confirmPassword, accountType, otp
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const email = req.body.email ;
-    const confirmPassword = req.body.confirmPassword;
-    const accountType = req.body.accountType;
-    const otp = req.body.otp;
-    const password = req.body.password;
-
-    // TODO 2: guard: if ANY of firstName, lastName, email, password,
-    //         confirmPassword, otp is missing → 400 "All fields are required"
-    //         (hint: use ! and || five times, or an array with .some())
-    if(!firstName || !lastName || !email || !password || !confirmPassword || !otp){
-        return res.status(400).json({success: false , message : "All fields are required"});
-
+    if (!firstName || !lastName || !email || !password || !confirmPassword || !otp) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+    if (![firstName, lastName, password, confirmPassword, otp].every((v) => typeof v === "string")) {
+      return res.status(400).json({ success: false, message: "Invalid input" });
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({ success: false, message: "Enter a valid email address" });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "Passwords do not match" });
+    }
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters and include a letter and a number",
+      });
+    }
+    if (!["Student", "Instructor"].includes(accountType)) {
+      return res.status(400).json({ success: false, message: "Invalid account type" });
     }
 
-    // TODO 3: guard: password !== confirmPassword → 400 "Passwords do not match"
-    if(password !== confirmPassword){
-        return res.status(400).json({success: false , message:"Passwords do not match"})
-    }
-    if(!["Student", "Instructor"].includes(accountType)){
-    return res.status(400).json({success: false, message: "Invalid account type"});
-}
-
-
-    // TODO 4: guard: user already exists? → 409 (same as sendOTP)
-     const user = await User.findOne({email});
-     if(user){
-        return res.status(409).json({success: false , message:"User already exists"})
-     }
-
-    // TODO 5: find the MOST RECENT otp for this email
-    //   const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-    //   - if recentOtp.length === 0 → 400 "OTP not found"
-    //   - else if otp !== recentOtp[0].otp → 400 "Invalid OTP"
-
-    const recentOtp = await OTP.find({email}).sort({createdAt:-1}).limit(1);
-    if(recentOtp.length === 0 ){
-        return res.status(400).json({success: false , message: "OTP not found"});
-
-    }
-    if(recentOtp[0].otp !== otp){
-         return res.status(400).json({success: false , message: "Invalid OTP"});
+    if (await User.findOne({ email })) {
+      return res.status(409).json({ success: false, message: "User already exists" });
     }
 
+    const recentOtp = await OTP.findOne({ email }).sort({ createdAt: -1 });
+    if (!recentOtp) {
+      return res.status(400).json({ success: false, message: "OTP expired or not found. Request a new one." });
+    }
+    if (recentOtp.attempts >= MAX_OTP_ATTEMPTS) {
+      await OTP.deleteMany({ email });
+      return res.status(429).json({ success: false, message: "Too many wrong attempts. Request a new OTP." });
+    }
+    const given = Buffer.from(otp.trim());
+    const expected = Buffer.from(recentOtp.otp);
+    if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
+      recentOtp.attempts += 1;
+      await recentOtp.save();
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
 
-    // TODO 6: hash the password:
-    //   const hashedPassword = await bcrypt.hash(password, 10);
-    //   (what does the 10 mean? see quiz)
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const profileDetails = await Profile.create({ gender: null, dob: null, about: null, contactNumber: null });
+    const fullName = `${firstName.trim()} ${lastName.trim()}`;
+    await User.create({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email,
+      password: hashedPassword,
+      accountType,
+      additionalDetails: profileDetails._id,
+      image: `https://api.dicebear.com/5.x/initials/svg?seed=${encodeURIComponent(fullName)}`,
+    });
+    await OTP.deleteMany({ email });
 
-    const hashedPassword = await bcrypt.hash(password , 10);
-    // TODO 7: create the Profile with empty/null fields:
-    //   const profileDetails = await Profile.create({ gender: null, dob: null, about: null, contactNumber: null });
-    //   (your Profile has more fields, but all are optional)
-    const profileDetails = await Profile.create({gender: null , dob : null , about : null , contactNumber: null});
-    // TODO 8: create the User:
-    //   await User.create({
-    //     firstName, lastName, email,
-    //     password: hashedPassword,
-    //     accountType,
-    //     additionalDetails: profileDetails._id,
-    //     image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
-    //   });
-    const userSigned = await User.create({
-           firstName , lastName , email , 
-           password: hashedPassword,
-           accountType,
-           additionalDetails : profileDetails._id,
-           image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
-    })
-    //   (the image is an auto-generated avatar from their initials)
-    // TODO 9: return 201 { success: true, message: "User registered successfully" }
-    //         (do NOT send back the password, not even hashed)
-    return res.status(201).json({success: true , message: "User registered successfully"})
-   } catch(err){
- // TODO 10: console.error, return 500 with a clear string message
-   console.error(err);
-   return res.status(500).json({success: false , message:"User cannot be registered. Please try again "});
-   }
-}
-
-
-// Client sends { email, password }
-//   → both present?
-//   → find user by email  (.select("+password") because the model hides it!)
-//   → no user → 401 "not registered"
-//   → bcrypt.compare(password, user.password)
-//   → wrong → 401 "Password is incorrect"
-//   → right → create JWT with { email, id, accountType }  ← the payload your auth middleware reads
-//   → save token in an httpOnly cookie
-//   → respond 200 with the user (but WITHOUT the password)
-
+    return res.status(201).json({ success: true, message: "User registered successfully" });
+  } catch (err) {
+    console.error(err);
+    if (err.code === 11000) {
+      return res.status(409).json({ success: false, message: "User already exists" });
+    }
+    if (err.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: "Invalid details provided" });
+    }
+    return res.status(500).json({ success: false, message: "User cannot be registered. Please try again." });
+  }
+};
 
 exports.logIn = async(req , res)=>{
     try{
-    const email = req.body.email ;
+    const email = normalizeEmail(req.body.email);
     const password = req.body.password;
-    if(!email || !password){
+    if(!email || typeof password !== "string" || !password){
         return res.status(400).json({success: false , message:"All fields are required"});
 
     }
@@ -165,6 +140,9 @@ exports.logIn = async(req , res)=>{
 
     if(!user){
         return res.status(401).json({success: false , message:"Invalid email or password"});
+    }
+    if(user.active === false){
+        return res.status(403).json({success: false , message:"This account has been deactivated"});
     }
     const match = await bcrypt.compare(password , user.password);
     if(!match){
@@ -184,7 +162,7 @@ exports.logIn = async(req , res)=>{
 }
 catch(err){
     console.error(err);
-    return res.status(500).json({success: false , message:" Something went wrong while login"})
+    return res.status(500).json({success: false , message:"Something went wrong while logging in"})
 }
 
 }
@@ -192,14 +170,12 @@ catch(err){
 exports.changePassword = async(req , res)=>{
 
   try {
-    // TODO 1: get oldPassword, newPassword, confirmNewPassword from req.body
  const oldpassword = req.body.oldpassword;
     const newpassword =  req.body.newpassword;
     const confirmpassword = req.body.confirmpassword;
    
     
     
-      // TODO 2: guard: any missing → 400 "All fields are required"
     if(!oldpassword){
  return res.status(400).json({success: false ,message:"All fields are required"});
     }
@@ -207,41 +183,31 @@ exports.changePassword = async(req , res)=>{
         return res.status(400).json({success: false ,message:"All fields are required"});
     }
   if(newpassword !== confirmpassword){
-        return res.status(400).json({success : false , message:" Confirm Passwords and New Password do not match"})
+        return res.status(400).json({success : false , message:"Confirm password does not match the new password"})
     }
 
-    // TODO 3: guard: newPassword !== confirmNewPassword → 400 "Passwords do not match"
 if(!confirmpassword || !newpassword){
        return res.status(400).json({success: false ,message:"Passwords do not match"});
     }
-    // TODO 4: guard: newPassword === oldPassword → 400 "New password must be different"
+    if(!isStrongPassword(newpassword)){
+        return res.status(400).json({success: false , message:"Password must be at least 8 characters and include a letter and a number"})
+    }
     if(newpassword === oldpassword){
         return res.status(400).json({success : false , message:"New password must be different"})
     }
 
-    // TODO 5: get the logged-in user:
-    //   const user = await User.findById(req.user.id).select("+password");
-    //   Where did req.user come from? (the auth middleware!)
-    //   no user → 404
 const user = await User.findById(req.user.id).select("+password");
 if(!user){
-    return res.status(404).json({success: false , message: "No user exist with this Id"})
+    return res.status(404).json({success: false , message: "No user exists with this ID"})
 }
-    // TODO 6: check the OLD password with bcrypt.compare
     const checkoldpassword  = await bcrypt.compare(oldpassword , user.password);
     if(!checkoldpassword){
         return res.status(401).json({success: false , message:"The old password is incorrect"})
     }
-    //   wrong → 401 "The old password is incorrect"
 
-    // TODO 7: hash the new one and save it:
-    //   user.password = await bcrypt.hash(newPassword, 10);
-    //   await user.save();
     user.password = await bcrypt.hash(newpassword , 10);
     await user.save();
 
-    // TODO 8: send a notification email with mailSender (user.email, a subject, a short html body)
-    //   Think: should a failed email stop the password change? Wrap it in its own try/catch.
        try {
         await mailSender(
             user.email,
@@ -252,14 +218,10 @@ if(!user){
         console.log(err);
     }
 
-
-
-    // TODO 9: return 200 { success: true, message: "Password updated successfully" }
     return res.status(200).json({success: true  , message:"Password updated successfully"})
   } catch (err) {
-    // TODO 10: console.error, 500 with a string message
     console.error(err);
-    return res.status(500).json({success: false , message: "Couldn't able to change password"});
+    return res.status(500).json({success: false , message: "Could not change the password"});
   }
 };
 
@@ -267,10 +229,4 @@ exports.logout = async( req , res)=>{
   res.clearCookie("token", getAuthCookieOptions());
   return res.status(200).json({success: true , message: "Logged out successfully"})
 }
-
-
-
-
-
-
 

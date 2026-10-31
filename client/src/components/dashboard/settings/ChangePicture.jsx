@@ -1,3 +1,4 @@
+import Avatar from "../../common/Avatar";
 import React from 'react' ;
 import { useState } from 'react' ;
 import { useDispatch , useSelector } from 'react-redux' ;
@@ -23,12 +24,12 @@ const ChangePicture = () => {
 
   return (
     <div className='border rounded-lg p-6 flex items-center gap-6'>
-        <img src={preview || user?.image} alt='avatar' className='w-20 h-20 rounded-full object-cover'/>
+        <Avatar src={preview || user?.image} firstName={user?.firstName} lastName={user?.lastName} className='size-20 text-2xl' alt='Your profile picture' />
         <div className='flex flex-col gap-2'>
-            <h2 className='font-semibold'>Chnage Profile Picture</h2>
+            <h2 className='font-semibold'>Change Profile Picture</h2>
             <div className="flex gap-3">
                 <input type='file' accept='image/*' onChange={handleChange}/>
-                <button onClick={handleUpload}  disabled = {!file} className="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50">
+                <button onClick={handleUpload}  disabled = {!file} className="btn-primary">
             Upload
             </button>
 

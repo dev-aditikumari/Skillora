@@ -1,12 +1,20 @@
 import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/operations/authAPI";
+import AuthLayout, { inputClass, primaryButton } from "../components/auth/AuthLayout";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("expired")) {
+      toast.error("Your session expired. Please log in again.");
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -18,19 +26,25 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm border rounded-lg p-6 shadow-sm flex flex-col gap-4"
-      >
-        <h1 className="text-2xl font-bold">Welcome back</h1>
-        <p className="text-sm text-gray-500 -mt-2">Log in to continue learning</p>
-
-        <label className="flex flex-col gap-1 text-sm">
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Log in to continue learning"
+      footer={
+        <>
+          New here?{" "}
+          <Link to="/signup" className="font-medium text-blue-600 hover:underline">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Email
           <input
-            className="border p-2 rounded"
+            className={inputClass}
             type="email"
+            autoComplete="email"
             name="email"
             value={formData.email}
             placeholder="you@example.com"
@@ -39,11 +53,12 @@ const Login = () => {
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Password
           <input
-            className="border p-2 rounded"
+            className={inputClass}
             type="password"
+            autoComplete="current-password"
             name="password"
             value={formData.password}
             placeholder="Your password"
@@ -52,28 +67,13 @@ const Login = () => {
           />
         </label>
 
-        <Link
-          to="/forget-password"
-          className="text-sm text-indigo-600 hover:underline self-end -mt-2"
-        >
+        <Link to="/forget-password" className="-mt-2 self-end text-sm text-blue-600 hover:underline">
           Forgot password?
         </Link>
 
-        <button
-          type="submit"
-          className="bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-        >
-          Log in
-        </button>
-
-        <p className="text-sm text-gray-500 text-center">
-          New here?{" "}
-          <Link to="/signup" className="text-indigo-600 hover:underline">
-            Create an account
-          </Link>
-        </p>
+        <button type="submit" className={primaryButton}>Log in</button>
       </form>
-    </div>
+    </AuthLayout>
   );
 };
 

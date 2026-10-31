@@ -28,13 +28,13 @@ const UpdatePassword = () => {
     <AuthLayout
       title="Choose a new password"
       footer={
-        <Link to="/login" className="text-indigo-600 hover:underline">← Back to login</Link>
+        <Link to="/login" className="text-blue-600 hover:underline">← Back to login</Link>
       }
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <input className={inputClass} type="password" name="password" placeholder="New password"
+        <input className={inputClass} type="password" autoComplete="new-password" name="password" placeholder="New password"
           value={formData.password} onChange={handleChange} required />
-        <input className={inputClass} type="password" name="confirmPassword"
+        <input className={inputClass} type="password" autoComplete="new-password" name="confirmPassword"
           placeholder="Confirm new password" value={formData.confirmPassword}
           onChange={handleChange} required />
         <button type="submit" className={primaryButton}>Reset password</button>

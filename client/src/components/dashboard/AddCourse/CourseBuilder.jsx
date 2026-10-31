@@ -76,7 +76,7 @@ const handleDeleteLecture = async (sectionId, subSectionId) => {
   if (updatedCourse) setCourse(updatedCourse);
 };
 
-// 125.4 (seconds, as a string) → "2:05"
+// turns seconds like 125.4 into "2:05"
 const formatDuration = (seconds) => {
   const total = Math.round(Number(seconds));
   if (!total) return "";
@@ -98,7 +98,7 @@ const formatDuration = (seconds) => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
         >
           {editingId ? "Save" : "Create Section"}
         </button>
@@ -146,7 +146,7 @@ const formatDuration = (seconds) => {
       <div className="flex gap-2">
         <button
           onClick={() => setLectureForm({ sectionId: section._id, lecture })}
-          className="text-indigo-600 hover:underline"
+          className="text-blue-600 hover:underline"
         >
           Edit
         </button>
@@ -175,7 +175,7 @@ const formatDuration = (seconds) => {
   ) : (
     <button
       onClick={() => setLectureForm({ sectionId: section._id, lecture: null })}
-      className="text-left text-indigo-600 hover:underline text-sm"
+      className="text-left text-blue-600 hover:underline text-sm"
     >
       + Add Lecture
     </button>
@@ -190,7 +190,7 @@ const formatDuration = (seconds) => {
   <button onClick={onBack} className="px-4 py-2 border rounded">
     Back
   </button>
-  <button onClick={handleNext} className="bg-indigo-600 text-white px-4 py-2 rounded">
+  <button onClick={handleNext} className="bg-blue-600 text-white px-4 py-2 rounded">
     Next
   </button>
 </div>

@@ -1,24 +1,43 @@
 import { Link } from "react-router-dom";
+import StarRating from "./StarRating";
+import { plural } from "../../utils/plural";
 
 const CourseCard = ({ course }) => (
   <Link
     to={`/courses/${course._id}`}
-    className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col bg-white"
+    className="card flex flex-col overflow-hidden hover:shadow-md"
   >
     <img
       src={course.thumbnail}
       alt={course.courseName}
-      className="w-full h-40 object-cover"
+      loading="lazy"
+      className="aspect-video w-full object-cover"
     />
-    <div className="p-4 flex flex-col gap-1 flex-1">
-      <h2 className="font-semibold">{course.courseName}</h2>
+
+    <div className="flex flex-1 flex-col gap-1.5 p-4">
+      {course.category?.name && <p className="text-xs text-blue-600">{course.category.name}</p>}
+      <h2 className="font-semibold leading-snug line-clamp-2">{course.courseName}</h2>
       <p className="text-sm text-gray-600 line-clamp-2">{course.courseDescription}</p>
       {course.instructor && (
         <p className="text-xs text-gray-500">
-          by {course.instructor.firstName} {course.instructor.lastName}
+          {course.instructor.firstName} {course.instructor.lastName}
         </p>
       )}
-      <p className="font-bold mt-auto pt-2">₹{course.price}</p>
+
+      <div className="flex items-center gap-2 text-xs text-gray-500">
+        {course.ratingCount > 0 ? (
+          <>
+            <span>{course.averageRating}</span>
+            <StarRating rating={course.averageRating} size="text-sm" />
+            <span>({course.ratingCount})</span>
+          </>
+        ) : (
+          <span>No ratings yet</span>
+        )}
+        {course.students > 0 && <span className="ml-auto">{plural(course.students, "student")}</span>}
+      </div>
+
+      <p className="mt-auto pt-2 text-lg font-bold">{course.price === 0 ? "Free" : `₹${course.price}`}</p>
     </div>
   </Link>
 );

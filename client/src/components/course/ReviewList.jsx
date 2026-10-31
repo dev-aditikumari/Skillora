@@ -1,4 +1,5 @@
 import StarRating from "./StarRating";
+import Avatar from "../common/Avatar";
 
 const ReviewList = ({ reviews }) => {
   return (
@@ -15,18 +16,8 @@ const ReviewList = ({ reviews }) => {
             const fullName = `${firstName} ${lastName}`.trim() || "Former student";
 
             return (
-              <div key={item._id} className="border rounded p-4 flex gap-3">
-                {item.user?.image ? (
-                  <img
-                    src={item.user.image}
-                    alt={fullName}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold">
-                    {(firstName[0] || "?").toUpperCase()}
-                  </div>
-                )}
+              <div key={item._id} className="card flex gap-3 p-4">
+                <Avatar src={item.user?.image} firstName={firstName} lastName={lastName} className="size-10" />
 
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
