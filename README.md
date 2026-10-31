@@ -175,7 +175,18 @@ All routes are under `/api/v1`. Protected routes expect `Authorization: Bearer <
 **API on Render** (`render.yaml`)
 1. Create a web service from the repo; it picks up `render.yaml` (Node 20.19, `server` root).
 2. Set the environment variables above, especially `CLIENT_URL` (exact frontend origin), `MONGODB_URL`, `JWT_SECRET`, Cloudinary and `MAIL_*`.
-3. Run `npm run seed` once with `ADMIN_EMAIL` and `ADMIN_PASSWORD` to create categories and the first admin.
+3. Create the starting data once, from your own computer (the database is empty until you do):
+   ```bash
+   cd server && npm install
+   export MONGODB_URL='<your Atlas connection string>'
+   ADMIN_EMAIL='you@example.com' ADMIN_PASSWORD='<strong password>' npm run seed
+   ```
+   This adds the five default categories and the first admin account.
+4. Optional, for a demo site: add sample courses, instructors, students and reviews.
+   ```bash
+   DEMO_PASSWORD='<private password>' npm run seed:demo
+   ```
+   Against a hosted database the script refuses to run without `DEMO_PASSWORD`, so the demo accounts never get a publicly known login. Do not use this on a database with real users.
 
 **Client on Vercel**
 1. Import the repo with `client` as the root directory.

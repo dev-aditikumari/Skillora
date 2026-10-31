@@ -1,7 +1,9 @@
 // Demo content for local development and demos: instructors, courses, students,
 // enrollments and reviews. Safe to re-run (existing courses are skipped).
 //   npm run seed:demo        (uses MONGODB_URL)
-// Everything is clearly fake: accounts are *@skillora.dev with password Demo1234.
+// Everything is clearly fake: accounts are *@skillora.dev.
+// Locally the password is Demo1234. Against a real database (mongodb+srv) set DEMO_PASSWORD
+// to a private value first, otherwise the script stops so nobody ships a publicly known login.
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 const mongoose = require("mongoose");
@@ -15,7 +17,14 @@ const SubSection = require("../models/SubSection");
 const CourseProgress = require("../models/CourseProgress");
 const RatingAndReview = require("../models/RatingAndReview");
 
-const PASSWORD = "Demo1234";
+const PASSWORD = process.env.DEMO_PASSWORD || "Demo1234";
+
+if (/^mongodb\+srv:/.test(process.env.MONGODB_URL || "") && !process.env.DEMO_PASSWORD) {
+  console.error("Refusing to seed demo users into a hosted database with the default password.");
+  console.error("Run again with DEMO_PASSWORD set to a private value, for example:");
+  console.error("  DEMO_PASSWORD='choose-a-private-password' npm run seed:demo");
+  process.exit(1);
+}
 const VIDEOS = [
   "https://res.cloudinary.com/demo/video/upload/dog.mp4",
   "https://res.cloudinary.com/demo/video/upload/elephants.mp4",
@@ -147,7 +156,8 @@ const seedDemo = async () => {
     created++;
   }
 
-  console.log(`Demo data ready: ${created} new courses (${COURSES.length} total), demo logins use password ${PASSWORD}`);
+  console.log(`Demo data ready: ${created} new courses (${COURSES.length} total)`);
+  console.log(PASSWORD === "Demo1234" ? "  demo logins use the default password Demo1234" : "  demo logins use the password you set in DEMO_PASSWORD");
   console.log(`  instructor: aarav.mehta@skillora.dev   student: ananya.rao@skillora.dev`);
 };
 
