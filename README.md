@@ -7,7 +7,7 @@ A full-stack learning management system. Students discover and buy courses, inst
 ## Features
 
 **Students**
-- Browse the catalog by category, view course details, syllabus, ratings and reviews
+- Search and filter courses, browse by category, view course details, syllabus, ratings and reviews
 - Buy courses with Razorpay (payment signature verified on the server) or enroll in free courses
 - Watch lectures, track progress, leave a review
 
@@ -26,23 +26,74 @@ A full-stack learning management system. Students discover and buy courses, inst
 - Role-based access control (Student, Instructor, Admin) on both API and UI routes
 - Security: Helmet, rate limiting, NoSQL-injection sanitising, OTP attempt limits, hashed reset tokens, upload type validation
 
+## Screenshots
+
+| Home | Category page |
+|---|---|
+| ![Home](docs/screenshots/home.png) | ![Category page](docs/screenshots/catalog.png) |
+
+| Course page | Lecture player |
+|---|---|
+| ![Course page](docs/screenshots/course-details.png) | ![Lecture player](docs/screenshots/lecture-player.png) |
+
+| Student: enrolled courses | Instructor dashboard |
+|---|---|
+| ![Enrolled courses](docs/screenshots/student-courses.png) | ![Instructor dashboard](docs/screenshots/instructor-dashboard.png) |
+
+| Instructor: course builder | Admin panel |
+|---|---|
+| ![Add course](docs/screenshots/add-course.png) | ![Admin panel](docs/screenshots/admin-panel.png) |
+
+| Login | Mobile |
+|---|---|
+| ![Login](docs/screenshots/login.png) | ![Mobile home](docs/screenshots/mobile-home.png) |
+
 ## Project structure
 
 ```
 Skillora/
-├── client/              React app (Vite)
-│   └── src/
-│       ├── components/  auth guards, dashboard, course UI
-│       ├── pages/       Home, Catalog, CourseDetails, ViewCourse, auth pages
-│       ├── services/    axios connector, endpoint map, API operations
-│       └── slices/      Redux Toolkit state (auth, profile)
-├── server/              Express API
-│   ├── controllers/     Auth, Course, Payment, Profile, Rating, Admin ...
-│   ├── middlewares/     JWT auth and role checks
-│   ├── models/          Mongoose schemas
-│   ├── routes/          Route definitions under /api/v1
-│   └── scripts/         seed.js, dev-memory.js
-├── render.yaml          Render (API) deployment
+├── client/                     React app (Vite)
+│   ├── public/
+│   │   ├── demo/               cover images used by the demo courses
+│   │   └── favicon.svg
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── auth/           route guards (logged in, logged out, role) and the auth card layout
+│   │   │   ├── common/         Logo, Avatar, Spinner, Footer
+│   │   │   ├── course/         CourseCard, SyllabusAccordion, InstructorCard, ReviewList, ReviewModal, StarRating
+│   │   │   ├── dashboard/      Sidebar, profile, enrolled courses, instructor and admin dashboards
+│   │   │   │   ├── AddCourse/  3 step course builder (info, sections and lectures, publish)
+│   │   │   │   └── settings/   change picture, edit profile, change password, delete account
+│   │   │   └── Navbar.jsx
+│   │   ├── pages/              Home, Catalog, CourseDetails, ViewCourse (lecture player),
+│   │   │                       Login, Signup, VerifyEmail, ForgetPassword, UpdatePassword,
+│   │   │                       Dashboard, NotFound
+│   │   ├── reducer/            Redux root reducer
+│   │   ├── services/
+│   │   │   ├── api.js          endpoint map
+│   │   │   ├── apiConnector.js axios instance (adds the JWT, handles expired sessions)
+│   │   │   └── operations/     auth, course, payment, profile, rating and admin API calls
+│   │   ├── slices/             Redux Toolkit state (auth, profile)
+│   │   └── utils/              plural.js, slug.js
+│   ├── index.html
+│   ├── vercel.json             rewrites every path to the app
+│   └── .env.example
+├── server/                     Express API
+│   ├── config/                 database, cloudinary, razorpay
+│   ├── controllers/            Admin, Auth, Category, Course, Payment, Profile, RatingAndReview, ResetPassword
+│   ├── mail/templates/         OTP email
+│   ├── middlewares/            JWT auth and role checks
+│   ├── models/                 User, Profile, Course, Section, SubSection, Category, CourseProgress,
+│   │                           Payment, RatingAndReview, OTP
+│   ├── routes/                 Admin, Course, Payment, Profile, RatingAndReview, User (all under /api/v1)
+│   ├── scripts/
+│   │   ├── seed.js             default categories and the first admin
+│   │   ├── seed-demo.js        12 demo courses with instructors, students and reviews
+│   │   └── dev-memory.js       runs the API on a throwaway in-memory MongoDB
+│   ├── utils/                  authCookie, imageUploads (Cloudinary), mailSender
+│   └── index.js                app setup, CORS, rate limiting, startup and shutdown
+├── docs/screenshots/           images used in this README
+├── render.yaml                 Render (API) deployment
 └── .env.example
 ```
 
