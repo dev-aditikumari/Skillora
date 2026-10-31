@@ -46,7 +46,7 @@ const EditProfile = () => {
         <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder='Address' className="col-span-2 border p-2 rounded"/>
         <textarea name="about" value={formData.about} onChange={handleChange} placeholder='About' rows={4} className="col-span-2 border p-2 rounded"/>
       </div>
-      <button type="submit" className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">Save</button>
+      <button type="submit" className="btn-primary mt-4">Save</button>
   </form>
   )
 }

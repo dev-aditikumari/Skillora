@@ -105,7 +105,8 @@ app.use(
 // ---------- rate limiting ----------
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 300,
+  limit: 1000, // an SPA fires several calls per page and users often share an IP
+  skip: (req) => req.path === "/health",
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { success: false, message: "Too many requests. Please try again later." },
@@ -115,6 +116,7 @@ const globalLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
+  skipSuccessfulRequests: true, // only failed attempts (wrong password, bad OTP) count
   standardHeaders: "draft-7",
   legacyHeaders: false,
   message: { success: false, message: "Too many attempts. Please try again in 15 minutes." },
@@ -127,6 +129,16 @@ cloudinaryConnect();
 
 // ---------- routes ----------
 app.use("/api/v1/course", CourseRoute);
+// each OTP sends an email, so cap those whether or not they succeed
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { success: false, message: "Too many verification emails requested. Please try again later." },
+});
+
+app.use("/api/v1/auth/sendotp", otpLimiter);
 app.use("/api/v1/auth", authLimiter, UserRoute);
 app.use("/api/v1/profile", ProfileRoute);
 app.use("/api/v1/payment", paymentRoutes);

@@ -31,9 +31,10 @@ import AdminDashboard from './components/dashboard/AdminDashboard'
 
 function App() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
 
+      <div className="flex flex-1 flex-col [&>*]:w-full">
       <Routes>
         <Route path="/" element={<Home />} />
 
@@ -80,10 +81,11 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </div>
 
       <Footer />
       <Toaster position="top-center" />
-    </>
+    </div>
   )
 }
 

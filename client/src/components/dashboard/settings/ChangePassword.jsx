@@ -22,13 +22,13 @@ const ChangePassword = () => {
   }
 
   return (
-   <form  onSubmit={handleSubmit} className='border rounded-lg p-6'>
+   <form  onSubmit={handleSubmit} className='card p-6'>
      <h2 className='font-semibold mb-4'>Change Password</h2>
      <div className='flex flex-col gap-4'> 
       <input type='password' autoComplete='current-password' value={formData.oldpassword} placeholder='Current password' onChange={handleChange} name='oldpassword' className="border p-2 rounded" /> 
        <input type='password' autoComplete='new-password' value={formData.newpassword} placeholder='New password' onChange={handleChange} name='newpassword' className="border p-2 rounded" /> 
         <input type='password' autoComplete='new-password' value={formData.confirmpassword} placeholder='Confirm password' onChange={handleChange} name='confirmpassword' className="border p-2 rounded" /> 
-        <button type="submit"  className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">Update Password</button>
+        <button type="submit"  className="btn-primary mt-2 self-start">Update Password</button>
      </div>
    </form>
   )

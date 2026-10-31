@@ -3,7 +3,7 @@ export const primaryButton =
   "btn-primary w-full py-2.5";
 
 const AuthLayout = ({ title, subtitle, children, footer }) => (
-  <div className="min-h-[calc(100vh-57px)] flex items-center justify-center bg-gradient-to-b from-indigo-50 to-slate-50 px-4 py-10">
+  <div className="flex flex-1 items-center justify-center bg-gradient-to-b from-indigo-50 to-slate-50 px-4 py-10">
     <div className="card w-full max-w-md p-8 shadow-lg flex flex-col gap-5">
       <div>
         <h1 className="text-2xl font-bold">{title}</h1>

@@ -28,7 +28,7 @@ const ChangePicture = () => {
             <h2 className='font-semibold'>Change Profile Picture</h2>
             <div className="flex gap-3">
                 <input type='file' accept='image/*' onChange={handleChange}/>
-                <button onClick={handleUpload}  disabled = {!file} className="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-50">
+                <button onClick={handleUpload}  disabled = {!file} className="btn-primary">
             Upload
             </button>
 
