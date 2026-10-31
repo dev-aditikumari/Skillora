@@ -37,7 +37,7 @@ const Navbar = () => {
   const avatar = <Avatar src={user?.image} firstName={user?.firstName} lastName={user?.lastName} className="size-8 text-sm" alt="Your profile picture" />;
 
   return (
-    <nav className="sticky top-0 z-40 h-[57px] border-b bg-white/90 px-4 backdrop-blur md:px-6 flex items-center justify-between">
+    <nav className="sticky top-0 z-40 h-[57px] border-b bg-white px-4 md:px-6 flex items-center justify-between">
       <Link to="/" onClick={closeMenu} aria-label="Skillora home">
         <Logo />
       </Link>
@@ -45,15 +45,15 @@ const Navbar = () => {
       {/* desktop */}
       <div className="hidden md:flex items-center gap-5">
         <div className="relative group">
-          <span className="cursor-pointer font-medium text-slate-700 hover:text-indigo-600">Catalog</span>
+          <span className="cursor-pointer font-medium text-gray-700 hover:text-blue-600">Catalog</span>
           <div className="absolute left-0 top-full z-20 hidden group-hover:block pt-2">
-            <div className="flex flex-col bg-white border rounded-xl shadow-lg p-2 min-w-52">
+            <div className="flex flex-col bg-white border rounded-md shadow p-2 min-w-52">
               {categories.length === 0 ? (
                 <p className="p-2 text-gray-400">No categories</p>
               ) : (
                 categories.map((cat) => (
                   <Link key={cat._id} to={`/catalog/${toSlug(cat.name)}`}
-                    className="p-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700">
+                    className="p-2 rounded-lg hover:bg-blue-50 hover:text-blue-700">
                     {cat.name}
                   </Link>
                 ))
@@ -64,7 +64,7 @@ const Navbar = () => {
 
         {!token ? (
           <>
-            <Link to="/login" className="font-medium text-slate-700 hover:text-indigo-600">Log in</Link>
+            <Link to="/login" className="font-medium text-gray-700 hover:text-blue-600">Log in</Link>
             <Link to="/signup"
               className="btn-primary !py-1.5">
               Sign up
@@ -72,7 +72,7 @@ const Navbar = () => {
           </>
         ) : (
           <>
-            <Link to="/dashboard/my-profile" className="flex items-center gap-2 hover:text-indigo-600">
+            <Link to="/dashboard/my-profile" className="flex items-center gap-2 hover:text-blue-600">
               {avatar}
               <span>{user?.firstName}</span>
             </Link>
@@ -86,7 +86,7 @@ const Navbar = () => {
 
       {/* mobile toggle */}
       <button
-        className="md:hidden rounded-lg border px-3 py-1 hover:bg-slate-50"
+        className="md:hidden rounded-lg border px-3 py-1 hover:bg-gray-50"
         onClick={() => setMenuOpen((open) => !open)}
         aria-label="Toggle menu"
       >

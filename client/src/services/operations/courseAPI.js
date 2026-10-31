@@ -159,12 +159,3 @@ export const fetchPublishedCourses = async (limit = 24) => {
   }
   return result;
 };
-export const fetchPublicStats = async () => {
-  try {
-    const response = await apiConnector("GET", courseEndpoints.PUBLIC_STATS_API);
-    return response.data.data;
-  } catch (error) {
-    console.error("Could not load platform stats", error);
-    return null;
-  }
-};

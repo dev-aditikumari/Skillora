@@ -19,7 +19,7 @@ const AddCourse = ({ initialCourse }) => {
         {steps.map((label, index) => (
           <div
             key={label}
-            className={index + 1 === step ? "font-bold text-indigo-600" : "text-gray-400"}
+            className={index + 1 === step ? "font-bold text-blue-600" : "text-gray-400"}
           >
             {index + 1}. {label}
           </div>

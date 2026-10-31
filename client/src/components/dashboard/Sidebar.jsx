@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 const linkClass = ({ isActive }) =>
   `whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium ${
-    isActive ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"
+    isActive ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-100"
   }`;
 
 const Sidebar = () => {

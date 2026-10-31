@@ -14,7 +14,6 @@ const MAX_OTP_ATTEMPTS = 5;
 
 const normalizeEmail = (value) => (typeof value === "string" ? value.trim().toLowerCase() : "");
 
-// at least 8 characters with a letter and a number
 const isStrongPassword = (password) =>
   typeof password === "string" && password.length >= 8 && password.length <= 128 &&
   /[A-Za-z]/.test(password) && /\d/.test(password);
@@ -33,7 +32,6 @@ exports.sendOTP = async (req, res) => {
       return res.status(409).json({ success: false, message: "User already registered" });
     }
 
-    // one live OTP per email: a resend replaces the previous code
     await OTP.deleteMany({ email });
     const otp = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
     const record = await OTP.create({ email, otp });
@@ -172,14 +170,12 @@ catch(err){
 exports.changePassword = async(req , res)=>{
 
   try {
-    // TODO 1: get oldPassword, newPassword, confirmNewPassword from req.body
  const oldpassword = req.body.oldpassword;
     const newpassword =  req.body.newpassword;
     const confirmpassword = req.body.confirmpassword;
    
     
     
-      // TODO 2: guard: any missing → 400 "All fields are required"
     if(!oldpassword){
  return res.status(400).json({success: false ,message:"All fields are required"});
     }
@@ -190,11 +186,9 @@ exports.changePassword = async(req , res)=>{
         return res.status(400).json({success : false , message:"Confirm password does not match the new password"})
     }
 
-    // TODO 3: guard: newPassword !== confirmNewPassword → 400 "Passwords do not match"
 if(!confirmpassword || !newpassword){
        return res.status(400).json({success: false ,message:"Passwords do not match"});
     }
-    // TODO 4: guard: newPassword === oldPassword → 400 "New password must be different"
     if(!isStrongPassword(newpassword)){
         return res.status(400).json({success: false , message:"Password must be at least 8 characters and include a letter and a number"})
     }
@@ -202,29 +196,18 @@ if(!confirmpassword || !newpassword){
         return res.status(400).json({success : false , message:"New password must be different"})
     }
 
-    // TODO 5: get the logged-in user:
-    //   const user = await User.findById(req.user.id).select("+password");
-    //   Where did req.user come from? (the auth middleware!)
-    //   no user → 404
 const user = await User.findById(req.user.id).select("+password");
 if(!user){
     return res.status(404).json({success: false , message: "No user exists with this ID"})
 }
-    // TODO 6: check the OLD password with bcrypt.compare
     const checkoldpassword  = await bcrypt.compare(oldpassword , user.password);
     if(!checkoldpassword){
         return res.status(401).json({success: false , message:"The old password is incorrect"})
     }
-    //   wrong → 401 "The old password is incorrect"
 
-    // TODO 7: hash the new one and save it:
-    //   user.password = await bcrypt.hash(newPassword, 10);
-    //   await user.save();
     user.password = await bcrypt.hash(newpassword , 10);
     await user.save();
 
-    // TODO 8: send a notification email with mailSender (user.email, a subject, a short html body)
-    //   Think: should a failed email stop the password change? Wrap it in its own try/catch.
        try {
         await mailSender(
             user.email,
@@ -235,12 +218,8 @@ if(!user){
         console.log(err);
     }
 
-
-
-    // TODO 9: return 200 { success: true, message: "Password updated successfully" }
     return res.status(200).json({success: true  , message:"Password updated successfully"})
   } catch (err) {
-    // TODO 10: console.error, 500 with a string message
     console.error(err);
     return res.status(500).json({success: false , message: "Could not change the password"});
   }
@@ -250,10 +229,4 @@ exports.logout = async( req , res)=>{
   res.clearCookie("token", getAuthCookieOptions());
   return res.status(200).json({success: true , message: "Logged out successfully"})
 }
-
-
-
-
-
-
 

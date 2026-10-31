@@ -34,7 +34,7 @@ const MyCourses = () => {
         <h1 className="text-2xl font-bold">My Courses</h1>
         <Link
           to="/dashboard/add-course"
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Add Course
         </Link>

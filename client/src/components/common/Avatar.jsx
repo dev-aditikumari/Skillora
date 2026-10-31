@@ -1,12 +1,6 @@
 import { useState } from "react";
 
-const COLORS = [
-  "from-indigo-500 to-violet-500",
-  "from-sky-500 to-indigo-500",
-  "from-pink-500 to-rose-500",
-  "from-emerald-500 to-teal-500",
-  "from-amber-500 to-orange-500",
-];
+const COLORS = ["bg-blue-600", "bg-green-600", "bg-rose-500", "bg-amber-600", "bg-purple-600"];
 
 // Profile image with a graceful fallback: initials on a coloured tile
 // (used when there is no image or it fails to load)
@@ -21,7 +15,7 @@ const Avatar = ({ src, firstName = "", lastName = "", className = "size-10", alt
       <span
         role="img"
         aria-label={alt || name || "User"}
-        className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${color} font-semibold text-white ${className}`}
+        className={`flex shrink-0 items-center justify-center rounded-full ${color} font-semibold text-white ${className}`}
       >
         {initials}
       </span>

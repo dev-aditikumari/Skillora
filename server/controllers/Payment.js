@@ -19,7 +19,6 @@ const enrollStudent = async (courseId, userId) => {
   });
 };
 
-// Free courses skip the payment gateway entirely
 exports.enrollFree = async (req, res) => {
   try {
     const { courseId } = req.body;
@@ -155,7 +154,6 @@ exports.verifyPayment = async (req, res) => {
       await enrollStudent(courseId, req.user.id);
     }
 
-    // The email must never undo a successful purchase
     try {
       const user = await User.findById(req.user.id);
       await mailSender(

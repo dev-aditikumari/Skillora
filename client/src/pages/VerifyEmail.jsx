@@ -44,7 +44,7 @@ const VerifyEmail = () => {
         <button
           type="button"
           onClick={() => dispatch(sendOtp(signupData.email, navigate))}
-          className="text-sm text-indigo-600 hover:underline"
+          className="text-sm text-blue-600 hover:underline"
         >
           Resend OTP
         </button>

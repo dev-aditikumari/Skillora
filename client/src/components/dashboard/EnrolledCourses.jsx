@@ -29,7 +29,7 @@ const EnrolledCourses = () => {
           <p className="text-gray-500">You haven't enrolled in any courses yet</p>
           <Link
             to="/"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Browse courses
           </Link>
@@ -65,7 +65,7 @@ const EnrolledCourses = () => {
   <div className="mt-2">
     <div className="h-2 bg-gray-200 rounded w-64">
       <div
-        className="h-2 bg-indigo-600 rounded"
+        className="h-2 bg-blue-600 rounded"
         style={{ width: `${progressPercentage}%` }}
       />
     </div>
@@ -79,7 +79,7 @@ const EnrolledCourses = () => {
 
               <button
                 onClick={() => navigate(`/view-course/${course._id}`)}
-                className="bg-indigo-600 text-white px-4 py-2 rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
                {buttonLabel}
               </button>

@@ -7,8 +7,8 @@ import Avatar from "../common/Avatar";
 // one label + value; shows "Add <label>" in gray when empty
 const Field = ({ label, value }) => (
   <div>
-    <p className="text-sm text-slate-500">{label}</p>
-    <p className={`break-words ${value ? "" : "text-slate-400"}`}>{value || `Add ${label}`}</p>
+    <p className="text-sm text-gray-500">{label}</p>
+    <p className={`break-words ${value ? "" : "text-gray-400"}`}>{value || `Add ${label}`}</p>
   </div>
 )
 
@@ -31,7 +31,7 @@ const MyProfile = () => {
           <Avatar src={user?.image} firstName={user?.firstName} lastName={user?.lastName} className="size-16 text-xl sm:size-20 sm:text-2xl" alt="Your profile picture" />
           <div className="min-w-0">
             <p className="text-lg font-semibold">{user?.firstName} {user?.lastName}</p>
-            <p className="truncate text-slate-500">{user?.email}</p>
+            <p className="truncate text-gray-500">{user?.email}</p>
           </div>
         </div>
         <Link to="/dashboard/settings" className="btn-primary">Edit</Link>

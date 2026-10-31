@@ -23,7 +23,7 @@ const ForgetPassword = () => {
           : `We've sent a reset link to ${email}. It expires in 15 minutes`
       }
       footer={
-        <Link to="/login" className="text-indigo-600 hover:underline">← Back to login</Link>
+        <Link to="/login" className="text-blue-600 hover:underline">← Back to login</Link>
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

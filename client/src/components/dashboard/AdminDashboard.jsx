@@ -72,7 +72,7 @@ const AdminDashboard = () => {
         <h2 className="text-xl font-semibold mb-3">Categories</h2>
         <div className="flex flex-wrap gap-2 mb-3">
           {categories.map((c) => (
-            <span key={c._id} className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-sm">{c.name}</span>
+            <span key={c._id} className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm">{c.name}</span>
           ))}
         </div>
         <form onSubmit={addCategory} className="flex flex-col sm:flex-row gap-2">
@@ -80,7 +80,7 @@ const AdminDashboard = () => {
             value={category.name} onChange={(e) => setCategory({ ...category, name: e.target.value })} />
           <input className="border rounded px-3 py-2 flex-1" placeholder="Description (optional)"
             value={category.description} onChange={(e) => setCategory({ ...category, description: e.target.value })} />
-          <button className="bg-indigo-600 text-white px-4 py-2 rounded">Add</button>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded">Add</button>
         </form>
       </section>
 

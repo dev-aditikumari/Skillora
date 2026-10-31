@@ -62,12 +62,12 @@ const Catalog = () => {
 
   return (
     <div>
-      <div className="bg-gradient-to-br from-indigo-600 to-violet-600 px-6 py-12 text-white">
+      <div className="border-b bg-white px-6 py-8">
         <div className="mx-auto max-w-6xl">
-          <Link to="/" className="text-sm text-indigo-200 hover:text-white">← All courses</Link>
-          <h1 className="mt-2 text-3xl font-extrabold md:text-4xl">{categoryData.name}</h1>
-          {categoryData.description && <p className="mt-2 max-w-2xl text-indigo-100">{categoryData.description}</p>}
-          <p className="mt-3 text-sm text-indigo-200">{plural(courses.length, "course")}</p>
+          <Link to="/" className="text-sm text-blue-600 hover:underline">Back to all courses</Link>
+          <h1 className="mt-2 text-3xl font-bold">{categoryData.name}</h1>
+          {categoryData.description && <p className="mt-1 text-gray-600">{categoryData.description}</p>}
+          <p className="mt-2 text-sm text-gray-500">{plural(courses.length, "course")}</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ const Catalog = () => {
               aria-label="Search courses"
               className="w-full sm:w-80"
             />
-            <label className="flex items-center gap-2 text-sm text-slate-600">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
               Sort by
               <select value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="newest">Newest</option>
@@ -98,10 +98,10 @@ const Catalog = () => {
         {courses.length === 0 ? (
           <div className="card flex flex-col items-center gap-2 border-dashed p-10 text-center">
             <p className="font-semibold">No courses in this category yet</p>
-            <p className="text-sm text-slate-500">Check back soon, or explore another category.</p>
+            <p className="text-sm text-gray-500">Check back soon, or explore another category.</p>
           </div>
         ) : visible.length === 0 ? (
-          <p className="text-slate-500">No courses match your search.</p>
+          <p className="text-gray-500">No courses match your search.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((course) => (

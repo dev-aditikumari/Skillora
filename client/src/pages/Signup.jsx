@@ -43,19 +43,19 @@ const Signup = () => {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-indigo-600 hover:underline">Log in</Link>
+          <Link to="/login" className="font-medium text-blue-600 hover:underline">Log in</Link>
         </>
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1">
+        <div className="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1">
           {["Student", "Instructor"].map((role) => (
             <button
               key={role}
               type="button"
               onClick={() => setType(role)}
               className={`py-1.5 rounded-md text-sm ${
-                type === role ? "bg-white shadow-sm font-semibold text-indigo-700" : "text-slate-500 hover:text-slate-700"
+                type === role ? "bg-white shadow-sm font-semibold text-blue-700" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               {role}

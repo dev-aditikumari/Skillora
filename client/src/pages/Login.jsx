@@ -32,14 +32,14 @@ const Login = () => {
       footer={
         <>
           New here?{" "}
-          <Link to="/signup" className="font-medium text-indigo-600 hover:underline">
+          <Link to="/signup" className="font-medium text-blue-600 hover:underline">
             Create an account
           </Link>
         </>
       }
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Email
           <input
             className={inputClass}
@@ -53,7 +53,7 @@ const Login = () => {
           />
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-slate-700">
+        <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Password
           <input
             className={inputClass}
@@ -67,7 +67,7 @@ const Login = () => {
           />
         </label>
 
-        <Link to="/forget-password" className="-mt-2 self-end text-sm text-indigo-600 hover:underline">
+        <Link to="/forget-password" className="-mt-2 self-end text-sm text-blue-600 hover:underline">
           Forgot password?
         </Link>
 

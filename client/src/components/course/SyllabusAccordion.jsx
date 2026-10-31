@@ -32,7 +32,7 @@ const SyllabusAccordion = ({ sections }) => {
     <div>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl font-semibold">Course Content</h2>
-        <button onClick={toggleAll} className="text-indigo-600 text-sm hover:underline">
+        <button onClick={toggleAll} className="text-blue-600 text-sm hover:underline">
           {allOpen ? "Collapse all" : "Expand all"}
         </button>
       </div>

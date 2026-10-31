@@ -28,7 +28,7 @@ const UpdatePassword = () => {
     <AuthLayout
       title="Choose a new password"
       footer={
-        <Link to="/login" className="text-indigo-600 hover:underline">← Back to login</Link>
+        <Link to="/login" className="text-blue-600 hover:underline">← Back to login</Link>
       }
     >
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
