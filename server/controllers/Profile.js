@@ -17,19 +17,21 @@ exports.updateProfile = async (req, res) => {
     
    
 
-    if(dob !== undefined) profile.dob = dob;
-    if(about !== undefined) profile.about = about;
-    if(contactNumber !== undefined) profile.contactNumber  = contactNumber;
-    if(gender !== undefined) profile.gender = gender;
-    if(address !== undefined)profile.address = address;
-    if(city !== undefined) profile.city = city;
+    // a blank field means "not set" (the form sends "" for an unselected gender or an empty city)
+    const fields = { dob, about, contactNumber, gender, address, city };
+    for (const [key, value] of Object.entries(fields)) {
+      if (value === undefined) continue;
+      profile[key] = typeof value === "string" && value.trim() === "" ? undefined : value;
+    }
     await profile.save();
 
     return res.status(200).json({success: true , message: "Profile updated" , profile});
   } catch (err) {
-    console.error(err)
-
-return res.status(500).json({success: false , message: "Unable to update the profile"})
+    if (err.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: "Please check your profile details and try again" });
+    }
+    console.error(err);
+    return res.status(500).json({success: false , message: "Unable to update the profile"})
 
    }
 };
