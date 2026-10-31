@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { fetchFullCourse, markLectureComplete } from "../services/operations/courseAPI";
 import ReviewModal from "../components/course/ReviewModal";
+import Spinner from "../components/common/Spinner";
 
 const ViewCourse = () => {
   const { courseId } = useParams();
@@ -38,7 +39,7 @@ const ViewCourse = () => {
     load();
   }, [courseId, navigate]);
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return <Spinner />;
   if (!course) return null;
 
   const allLectures = course.courseContent.flatMap((s) => s.subSection);

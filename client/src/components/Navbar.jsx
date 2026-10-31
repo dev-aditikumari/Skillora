@@ -5,6 +5,7 @@ import { logout } from "../services/operations/authAPI";
 import { apiConnector } from "../services/apiConnector";
 import { categoriesEndpoints } from "../services/api";
 import { toSlug } from "../utils/slug";
+import Logo from "./common/Logo";
 
 const Navbar = () => {
   const token = useSelector((state) => state.auth.token);
@@ -33,7 +34,7 @@ const Navbar = () => {
   };
 
   const avatar = user?.image ? (
-    <img src={user.image} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+    <img src={user.image} alt="Your profile picture" className="w-8 h-8 rounded-full object-cover" />
   ) : (
     <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-semibold">
       {user?.firstName?.[0] || "?"}
@@ -41,21 +42,23 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="relative h-[57px] border-b px-4 md:px-6 flex items-center justify-between bg-white">
-      <Link to="/" className="text-xl font-bold" onClick={closeMenu}>Skillora</Link>
+    <nav className="sticky top-0 z-40 h-[57px] border-b bg-white/90 px-4 backdrop-blur md:px-6 flex items-center justify-between">
+      <Link to="/" onClick={closeMenu} aria-label="Skillora home">
+        <Logo />
+      </Link>
 
       {/* desktop */}
       <div className="hidden md:flex items-center gap-5">
         <div className="relative group">
-          <span className="cursor-pointer">Catalog</span>
+          <span className="cursor-pointer font-medium text-slate-700 hover:text-indigo-600">Catalog</span>
           <div className="absolute left-0 top-full z-20 hidden group-hover:block pt-2">
-            <div className="flex flex-col bg-white border rounded-lg shadow-lg p-2 min-w-48">
+            <div className="flex flex-col bg-white border rounded-xl shadow-lg p-2 min-w-52">
               {categories.length === 0 ? (
                 <p className="p-2 text-gray-400">No categories</p>
               ) : (
                 categories.map((cat) => (
                   <Link key={cat._id} to={`/catalog/${toSlug(cat.name)}`}
-                    className="p-2 rounded hover:bg-gray-100">
+                    className="p-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700">
                     {cat.name}
                   </Link>
                 ))
@@ -66,9 +69,9 @@ const Navbar = () => {
 
         {!token ? (
           <>
-            <Link to="/login" className="hover:text-indigo-600">Login</Link>
+            <Link to="/login" className="font-medium text-slate-700 hover:text-indigo-600">Log in</Link>
             <Link to="/signup"
-              className="bg-indigo-600 text-white px-4 py-1.5 rounded hover:bg-indigo-700">
+              className="btn-primary !py-1.5">
               Sign up
             </Link>
           </>
@@ -79,7 +82,7 @@ const Navbar = () => {
               <span>{user?.firstName}</span>
             </Link>
             <button onClick={handleLogout}
-              className="border px-3 py-1 rounded hover:bg-gray-100">
+              className="btn-secondary !px-3 !py-1">
               Logout
             </button>
           </>
@@ -88,7 +91,7 @@ const Navbar = () => {
 
       {/* mobile toggle */}
       <button
-        className="md:hidden border rounded px-3 py-1"
+        className="md:hidden rounded-lg border px-3 py-1 hover:bg-slate-50"
         onClick={() => setMenuOpen((open) => !open)}
         aria-label="Toggle menu"
       >
@@ -111,7 +114,7 @@ const Navbar = () => {
           <hr />
           {!token ? (
             <>
-              <Link to="/login" onClick={closeMenu}>Login</Link>
+              <Link to="/login" onClick={closeMenu}>Log in</Link>
               <Link to="/signup" onClick={closeMenu}>Sign up</Link>
             </>
           ) : (

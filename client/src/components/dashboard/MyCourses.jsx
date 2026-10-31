@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchInstructorCourses, deleteCourse } from "../../services/operations/courseAPI";
+import Spinner from "../../components/common/Spinner";
 
 const MyCourses = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const MyCourses = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="max-w-5xl">

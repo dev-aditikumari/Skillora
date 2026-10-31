@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1").replace(/\/$/, "");
 
 export const endpoints = {
   SENDOTP_API:  BASE_URL + "/auth/sendotp",
@@ -46,6 +46,7 @@ export const courseEndpoints = {
 export const paymentEndpoints = {
   CAPTURE_PAYMENT_API: BASE_URL + "/payment/capture-payment",
   VERIFY_PAYMENT_API: BASE_URL + "/payment/verify-payment",
+  ENROLL_FREE_API: BASE_URL + "/payment/enroll-free",
 };
 
 
@@ -53,4 +54,12 @@ export const ratingEndpoints = {
   CREATE_RATING_API: BASE_URL + "/rating/create-rating",
   AVERAGE_RATING_API: BASE_URL + "/rating/average-rating",
   ALL_RATINGS_API: BASE_URL + "/rating/all-ratings",
+};
+
+export const adminEndpoints = {
+  STATS_API: BASE_URL + "/admin/stats",
+  USERS_API: BASE_URL + "/admin/users",
+  USER_STATUS_API: BASE_URL + "/admin/user-status",
+  COURSES_API: BASE_URL + "/admin/courses",
+  CREATE_CATEGORY_API: BASE_URL + "/course/create-category",
 };

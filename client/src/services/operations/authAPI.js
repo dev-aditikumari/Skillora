@@ -14,11 +14,11 @@ export const sendOtp = (email , navigate) =>{
             if(!response.data.success){
                 throw new Error(response.data.message)
             }
-            toast.success("OTP Sent");
+            toast.success("OTP sent to your email");
             navigate("/verify-email");
         }
         catch(error){
-            toast.error(error.response?.data?.message || error.message || "Could not send OTP");
+            toast.error(error.response?.data?.message || error.message || "Could not send the OTP");
         }
         dispatch(setLoading(false));
         toast.dismiss(toastId);
@@ -40,7 +40,7 @@ export const  signUp =  (accountType , firstName , lastName , email , password ,
        if(!response.data.success){
         throw new Error(response.data.message);
        }
-       toast.success("Signup Successful");
+       toast.success("Account created. Please log in");
        navigate("/login")
         }catch(error){
             toast.error(error.response?.data?.message || error.message || "Signup Failed")
@@ -54,14 +54,14 @@ export const  signUp =  (accountType , firstName , lastName , email , password ,
 
 export const login = (email , password , navigate) =>{
     return  async (dispatch)=>{
-        const toastId = toast.loading("Loading");
+        const toastId = toast.loading("Loading...");
         dispatch(setLoading(true));
         try {
             const response = await apiConnector("POST" , LOGIN_API , {email , password});
             if(!response.data.success){
                 throw new Error(response.data.message)
             }
-            toast.success("Login Successful");
+            toast.success("Logged in successfully");
             dispatch(setToken(response.data.token));
             dispatch(setUser(response.data.user));
             localStorage.setItem("token" , JSON.stringify(response.data.token))
@@ -88,7 +88,7 @@ export const getPasswordResetToken = (email , setEmailSent) =>{
         if(!response.data.success){
             throw new Error(response.data.message)
         }
-        toast.success("Reset email sent");
+        toast.success("Reset link sent. Check your email");
         setEmailSent(true)
 
 
@@ -109,7 +109,7 @@ export const logout = (navigate) =>{
             if(!response.data.success){
                 throw new Error(response.data.message)
             }
-            toast.success("LOGOUT SUCCESSFULL")
+            toast.success("Logged out successfully")
         }catch(error){
              toast.error(error.response?.data?.message || error.message || "Failed to logout") 
         }
@@ -152,7 +152,7 @@ export const changePassword = (data)=>{
         if(!response.data.success){
             throw new Error(response.data.message);
         }
-        toast.success("Password changed");
+        toast.success("Password changed successfully");
          
 
     }catch(error){

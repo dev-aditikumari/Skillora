@@ -41,7 +41,7 @@ exports.updateProfile = async (req, res) => {
   } catch (err) { /* TODO 5 */
     console.error(err)
 
-return res.status(500).json({success: false , message: "Unable to update profile "})
+return res.status(500).json({success: false , message: "Unable to update the profile"})
 
    }
 };
@@ -102,7 +102,7 @@ exports.getAllUserDetails = async (req, res) => {
     // TODO 10: User.findById(req.user.id).populate("additionalDetails").exec()
 
     const user =await  User.findById(req.user.id).populate("additionalDetails").exec();
-    return res.status(200).json({success: true , message: "All info of user fetched" , user})
+    return res.status(200).json({success: true , message: "User details fetched" , user})
     //          return 200 with the user (no password! why isn't it there?)
   } catch (err) { /* TODO 11 */
     console.error(err);
@@ -117,7 +117,7 @@ exports.updateDisplayPicture = async (req, res) => {
     // TODO 12: guard: no req.files or no req.files.displayPicture → 400
      
      if(!req.files|| !req.files.displayProfile){
-      return res.status(400).json({success: false , message:"Unable to fetch file of user" })
+      return res.status(400).json({success: false , message:"Please choose an image to upload" })
      }
      
      const files = req.files.displayProfile;
@@ -129,7 +129,7 @@ exports.updateDisplayPicture = async (req, res) => {
     //          hint: User.findByIdAndUpdate(id, { image: ... }, { new: true })
       const updatedUser = await User.findByIdAndUpdate(req.user.id , { image: url.secure_url },{new:true})
     // TODO 15: return 200 with the updated user
-    return res.status(200).json({success: true , message:"Updated Profile Picture" , user: updatedUser})
+    return res.status(200).json({success: true , message:"Profile picture updated" , user: updatedUser})
   } catch (err) { /* TODO 16 */ 
     console.error(err);
     return res.status(500).json({success: false , message :"Unable to update profile picture"})

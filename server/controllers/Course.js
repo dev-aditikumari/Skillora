@@ -104,7 +104,7 @@ exports.updateSection = async (req, res) => {
   try {
     const { sectionName, sectionId, courseId } = req.body;
     if (!sectionName || !sectionId || !courseId) {
-      return res.status(400).json({ success: false, message: "Missing credentials" });
+      return res.status(400).json({ success: false, message: "Section name and course id are required" });
     }
 
     const course = await Course.findById(courseId);

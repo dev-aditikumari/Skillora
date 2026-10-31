@@ -37,12 +37,12 @@ exports.showAllCategories = async(req , res)=>{
         // TODO 6: const categories = await Category.find({}, { name: true, description: true })
     //   (the second argument picks only those fields, so you don't send the course lists)
     const categories = await Category.find({} , {name: true , description : true});
-    res.status(200).json({success: true , message : "Successfully showed all the categories" , categories})
+    res.status(200).json({success: true , message : "Categories fetched successfully" , categories})
 
     }catch(err){
         console.error(err);
         return res.status(500).json(
-            {success: false , message:"Unable to show all categories"}
+            {success: false , message:"Unable to fetch categories"}
         )
     }
 }

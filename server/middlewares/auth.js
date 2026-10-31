@@ -1,76 +1,43 @@
 const jwt = require("jsonwebtoken");
-const Profile = require("../models/Profile");
+const User = require("../models/User");
 
+const fail = (res, status, message) => res.status(status).json({ success: false, message });
 
-// 1. Auth : is the token valid?
+// Is the token valid? Accepts the Authorization header (used by the SPA)
+// or the httpOnly cookie. The request body is never trusted for a token.
+exports.auth = async (req, res, next) => {
+  try {
+    const header = req.header("Authorization");
+    const bearer = header && header.startsWith("Bearer ") ? header.slice(7).trim() : null;
+    const token = bearer || req.cookies?.token;
+    if (!token) return fail(res, 401, "Token missing");
 
-exports.auth = async(req , res , next)=>{
+    let decoded;
     try {
-    // TODO 1: get the token from ONE of these three places (use || to try each in turn):
-    //   - req.cookies.token
-    //   - req.body?.token
-    //   - the "Authorization" header, which looks like "Bearer <token>"
-    //     hint: req.header("Authorization")?.replace(???, "")
-     const token = (req.cookies.token || req.body?.token || req.header("Authorization")?.replace("Bearer " , ""))
-    // TODO 2: guard clause (like your upload route!):
-    //   if there is no token → return 401 { success:false, message:"Token missing" }
-     if(!token){
-        return res.status(401).json({success: false , message:"Token missing" })
-     }
-    // TODO 3: verify it, in its own small try/catch:
-    //   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    //   save decoded on req.user
-    //   if verify throws → return 401 "Token is invalid"
-    try{
-        const decode = jwt.verify(token , process.env.JWT_SECRET);
-        req.user = decode;
-       
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return fail(res, 401, "Token is invalid or expired");
+    }
 
-    }
-    catch(err){
-        return res.status(401).json({success: false , message :"Token is invalid"})
-    }
-      next();
-    // TODO 4: pass control on → what function do you call?
+    // the account may have been deleted or deactivated after the token was issued
+    const user = await User.findById(decoded.id).select("accountType active");
+    if (!user || user.active === false) return fail(res, 401, "Account no longer exists");
+
+    req.user = { id: decoded.id, email: decoded.email, accountType: user.accountType };
+    next();
   } catch (err) {
-    // TODO 5: return 500 "Something went wrong while validating the token"
     console.error(err);
-    return res.status(500).json({success: false , message : "Something went wrong while validating the token"})
+    return fail(res, 500, "Something went wrong while validating the token");
   }
 };
 
-
-// ROLE CHECKS
-
-exports.isStudent = async( req , res ,next)=>{
-    // TODO 6: if req.user.accountType is NOT "Student" → return 401
-  //         "This is a protected route for Students only"
-  //         otherwise → next()
-  if (req.user.accountType !== "Student"){
-    return res.status(403).json({success: false , message:"This is a protected route for Students only"})
+const requireRole = (role) => (req, res, next) => {
+  if (req.user?.accountType !== role) {
+    return fail(res, 403, `This is a protected route for ${role}s only`);
   }
   next();
+};
 
-}
-exports.isAdmin = async( req , res ,next)=>{
-    // TODO 6: if req.user.accountType is NOT "Admin" → return 401
-  //         "This is a protected route for Admin only"
-  //         otherwise → next()
-  if (req.user.accountType !== "Admin"){
-    return res.status(403).json({success: false , message:"This is a protected route for Admin only"})
-  }
-  next();
-
-}
-exports.isInstructor = async( req , res ,next)=>{
-    // TODO 6: if req.user.accountType is NOT "Instructor" → return 401
-  //         "This is a protected route for Instructor only"
-  //         otherwise → next()
-  if (req.user.accountType !== "Instructor"){
-    return res.status(403).json({success: false , message:"This is a protected route for Instructor only"})
-  }
-  next();
-
-}
-
-
+exports.isStudent = requireRole("Student");
+exports.isInstructor = requireRole("Instructor");
+exports.isAdmin = requireRole("Admin");

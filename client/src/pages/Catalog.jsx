@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { apiConnector } from "../services/apiConnector";
 import { categoriesEndpoints } from "../services/api";
 import CourseCard from "../components/course/CourseCard";
+import Spinner from "../components/common/Spinner";
 
 const Catalog = () => {
   const { catalogName } = useParams();
@@ -41,7 +42,7 @@ const Catalog = () => {
     fetchCategoryPage();
   }, [catalogName]);
 
-  if (loading) return <p className="p-6">Loading...</p>;
+  if (loading) return <Spinner />;
   if (!categoryData) return <p className="p-6">Category not found</p>;
 
   return (

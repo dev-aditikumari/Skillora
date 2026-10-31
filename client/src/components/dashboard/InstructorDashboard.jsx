@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { fetchInstructorStats } from "../../services/operations/courseAPI";
+import Spinner from "../../components/common/Spinner";
 
 const formatMoney = (amount) => `₹${Number(amount).toLocaleString("en-IN")}`;
 
@@ -57,7 +58,7 @@ const InstructorDashboard = () => {
     load();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
   if (!stats) return <p className="text-gray-500">Could not load your dashboard</p>;
 
   const { totals, courses } = stats;

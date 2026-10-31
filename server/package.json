@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "seed": "node scripts/seed.js",
+    "dev:memory": "node scripts/dev-memory.js"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,10 @@
     "razorpay": "^2.9.8"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^10.4.3",
     "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   }
 }

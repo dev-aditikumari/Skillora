@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchEnrolledCourses } from "../../services/operations/profileAPI";
+import Spinner from "../../components/common/Spinner";
 
 const EnrolledCourses = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const EnrolledCourses = () => {
     loadCourses();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="max-w-5xl">
@@ -24,7 +25,7 @@ const EnrolledCourses = () => {
 
       {courses.length === 0 ? (
         <div className="flex flex-col gap-4 items-start">
-          <p className="text-gray-500">You haven't enrolled in any course yet</p>
+          <p className="text-gray-500">You haven't enrolled in any courses yet</p>
           <Link
             to="/"
             className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"

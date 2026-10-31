@@ -3,22 +3,31 @@ import { Link } from "react-router-dom";
 const CourseCard = ({ course }) => (
   <Link
     to={`/courses/${course._id}`}
-    className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col bg-white"
+    className="group card flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-lg"
   >
-    <img
-      src={course.thumbnail}
-      alt={course.courseName}
-      className="w-full h-40 object-cover"
-    />
-    <div className="p-4 flex flex-col gap-1 flex-1">
-      <h2 className="font-semibold">{course.courseName}</h2>
-      <p className="text-sm text-gray-600 line-clamp-2">{course.courseDescription}</p>
+    <div className="overflow-hidden bg-slate-100">
+      <img
+        src={course.thumbnail}
+        alt={course.courseName}
+        loading="lazy"
+        className="h-44 w-full object-cover transition duration-300 group-hover:scale-105"
+      />
+    </div>
+    <div className="flex flex-1 flex-col gap-1.5 p-4">
+      <h2 className="font-semibold leading-snug text-slate-900 line-clamp-2">{course.courseName}</h2>
+      <p className="text-sm text-slate-600 line-clamp-2">{course.courseDescription}</p>
       {course.instructor && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-slate-500">
           by {course.instructor.firstName} {course.instructor.lastName}
         </p>
       )}
-      <p className="font-bold mt-auto pt-2">₹{course.price}</p>
+      <p className="mt-auto pt-3 text-lg font-bold text-slate-900">
+        {course.price === 0 ? (
+          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-sm font-semibold text-emerald-700">Free</span>
+        ) : (
+          `₹${course.price}`
+        )}
+      </p>
     </div>
   </Link>
 );

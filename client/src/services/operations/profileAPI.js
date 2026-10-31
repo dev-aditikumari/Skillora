@@ -23,7 +23,7 @@ return async (dispatch)=>{
         saveUser(dispatch , response.data.user)
 
     }catch(error){
-        toast.error(error.response?.data?.message || "Could not load profile")
+        toast.error(error.response?.data?.message || "Could not load your profile")
     }
 }
 }
@@ -42,7 +42,7 @@ export const updateProfile = (data) => {
     toast.success("Profile updated");
     dispatch(getUserDetails())
 }catch(error){
-    toast.error(error.response?.data?.message || "Could not upload profile")
+    toast.error(error.response?.data?.message || "Could not update your profile")
 }
   }
 }
@@ -59,11 +59,11 @@ export const updateDisplayPicture = (formData) => {
     if(!response.data.success){
         throw new Error(response.data.message);
     }
-    toast.success("Updated Display picture");
+    toast.success("Profile picture updated");
     saveUser(dispatch  , response.data.user);
 
    }catch(error){
-    toast.error(error.response?.data?.message || "Could not upload display picture")
+    toast.error(error.response?.data?.message || "Could not update your profile picture")
    }
 }
 }
@@ -90,7 +90,7 @@ export const deleteProfile = (navigate) => {
     localStorage.removeItem("user");
     navigate("/")}
     catch(error){
-toast.error(error.response?.data?.message || "Could not able to delete profile")
+toast.error(error.response?.data?.message || "Could not delete your account")
 
   }
   }

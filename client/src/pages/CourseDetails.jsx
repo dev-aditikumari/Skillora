@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { fetchCourseDetails } from "../services/operations/courseAPI";
 import { fetchAverageRating, fetchAllRatings } from "../services/operations/ratingAPI";
-import { buyCourse } from "../services/operations/paymentAPI";
+import { buyCourse, enrollFree } from "../services/operations/paymentAPI";
 import SyllabusAccordion from "../components/course/SyllabusAccordion";
 import InstructorCard from "../components/course/InstructorCard";
 import StarRating from "../components/course/StarRating";
 import ReviewList from "../components/course/ReviewList";
+import Spinner from "../components/common/Spinner";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -42,7 +43,7 @@ const CourseDetails = () => {
     loadCourse();
   }, [courseId]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Spinner />;
   if (!course) return <p>Course not found</p>;
 
   const totalLectures = course.courseContent.reduce(
@@ -64,6 +65,10 @@ const CourseDetails = () => {
     }
     if (owned) {
       navigate("/dashboard/enrolled-courses");
+      return;
+    }
+    if (course.price === 0) {
+      enrollFree(course._id, navigate, dispatch);
       return;
     }
     buyCourse(course._id, user, navigate, dispatch);
@@ -109,9 +114,9 @@ const CourseDetails = () => {
 
       <div className="border rounded p-4 h-fit flex flex-col gap-4">
         <img src={course.thumbnail} alt={course.courseName} className="w-full rounded" />
-        <p className="text-2xl font-bold">₹{course.price}</p>
+        <p className="text-2xl font-bold">{course.price === 0 ? "Free" : `₹${course.price}`}</p>
         <button onClick={handleBuy} className="bg-indigo-600 text-white px-4 py-2 rounded">
-          {owned ? "Go to Course" : "Buy Now"}
+          {owned ? "Go to Course" : course.price === 0 ? "Enroll for Free" : "Buy Now"}
         </button>
 
         {course.instructions.length > 0 && (

@@ -3,7 +3,7 @@ import { apiConnector } from "../apiConnector";
 import { paymentEndpoints } from "../api";
 import { getUserDetails } from "./profileAPI";
 
-const { CAPTURE_PAYMENT_API, VERIFY_PAYMENT_API } = paymentEndpoints;
+const { CAPTURE_PAYMENT_API, VERIFY_PAYMENT_API, ENROLL_FREE_API } = paymentEndpoints;
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -60,6 +60,20 @@ export const buyCourse = async (courseId, user, navigate, dispatch) => {
     paymentObject.open();
   } catch (error) {
     toast.error(error.response?.data?.message || error.message || "Could not start payment");
+  }
+  toast.dismiss(toastId);
+};
+
+export const enrollFree = async (courseId, navigate, dispatch) => {
+  const toastId = toast.loading("Enrolling...");
+  try {
+    const response = await apiConnector("POST", ENROLL_FREE_API, { courseId });
+    if (!response.data.success) throw new Error(response.data.message);
+    toast.success("You are enrolled!");
+    dispatch(getUserDetails());
+    navigate("/dashboard/enrolled-courses");
+  } catch (error) {
+    toast.error(error.response?.data?.message || error.message || "Could not enroll");
   }
   toast.dismiss(toastId);
 };

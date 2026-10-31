@@ -6,6 +6,45 @@ const User = require("../models/User");
 const CourseProgress = require("../models/CourseProgress");
 const mailSender = require("../utils/mailSender");
 
+const enrollStudent = async (courseId, userId) => {
+  await Course.findByIdAndUpdate(courseId, { $addToSet: { studentsEnrolled: userId } });
+
+  let progress = await CourseProgress.findOne({ courseId, userId });
+  if (!progress) {
+    progress = await CourseProgress.create({ courseId, userId, completeVideos: [] });
+  }
+
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { courses: courseId, courseProgress: progress._id },
+  });
+};
+
+// Free courses skip the payment gateway entirely
+exports.enrollFree = async (req, res) => {
+  try {
+    const { courseId } = req.body;
+    if (!courseId) {
+      return res.status(400).json({ success: false, message: "Course id is required" });
+    }
+    const course = await Course.findById(courseId);
+    if (!course || course.status !== "Published") {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+    if (course.price !== 0) {
+      return res.status(400).json({ success: false, message: "This course requires payment" });
+    }
+    if (course.studentsEnrolled.some((id) => id.toString() === req.user.id)) {
+      return res.status(400).json({ success: false, message: "You are already enrolled in this course" });
+    }
+
+    await enrollStudent(courseId, req.user.id);
+    return res.status(200).json({ success: true, message: "You are enrolled!" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Could not enroll in this course" });
+  }
+};
+
 exports.capturePayment = async (req, res) => {
   try {
     if (!razorpayEnabled) {
@@ -33,10 +72,10 @@ exports.capturePayment = async (req, res) => {
     }
 
     if (course.price === 0) {
-      return res.status(400).json({ success: false, message: "Free courses are not supported yet" });
+      return res.status(400).json({ success: false, message: "This course is free, enroll directly" });
     }
 
-    const amount = course.price * 100; // paise, from the database
+    const amount = Math.round(course.price * 100); // paise, from the database
 
     const order = await razorpayInstance.orders.create({
       amount,
@@ -112,24 +151,8 @@ exports.verifyPayment = async (req, res) => {
     payment.paymentId = razorpay_payment_id;
     await payment.save();
 
-    // Enroll the student in every course on this payment
     for (const courseId of payment.courses) {
-      await Course.findByIdAndUpdate(courseId, {
-        $addToSet: { studentsEnrolled: req.user.id },
-      });
-
-      let progress = await CourseProgress.findOne({ courseId, userId: req.user.id });
-      if (!progress) {
-        progress = await CourseProgress.create({
-          courseId,
-          userId: req.user.id,
-          completeVideos: [],
-        });
-      }
-
-      await User.findByIdAndUpdate(req.user.id, {
-        $addToSet: { courses: courseId, courseProgress: progress._id },
-      });
+      await enrollStudent(courseId, req.user.id);
     }
 
     // The email must never undo a successful purchase

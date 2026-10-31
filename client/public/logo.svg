@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 48" role="img" aria-label="Skillora">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="12" fill="url(#g)"/>
+  <path d="M32 17.5C29.5 14 15 13.5 15 21.5c0 7.5 18 3.5 18 11 0 7.5-14.500 7-18 2.500" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="35.500" cy="12.500" r="3.500" fill="#fbbf24"/>
+  <text x="60" y="33" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="27" font-weight="800" letter-spacing="-0.5" fill="#0f172a">Skillora</text>
+</svg>
