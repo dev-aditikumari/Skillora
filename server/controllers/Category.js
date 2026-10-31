@@ -1,5 +1,6 @@
 
 const Category= require("../models/Category");
+const { toCourseCard } = require("./Course");
 
 
 // Create a category (admin , only)
@@ -57,15 +58,24 @@ exports.categoryPageDetails = async (req, res) => {
     const selectedCategory = await Category.findById(categoryId).populate({
       path: "courses",
       match: { status: "Published" },
-      select :"courseName  courseDescription price thumbnail instructor createdAt",
-      populate:{path:"instructor" , select:"firstName lastName"}
+      select :"courseName courseDescription price thumbnail instructor createdAt studentsEnrolled ratingAndReviews",
+      populate:[
+        { path: "instructor", select: "firstName lastName" },
+        { path: "ratingAndReviews", select: "rating" },
+      ]
     });
 
     if (!selectedCategory) {
       return res.status(404).json({ success: false, message: "Category not found" });
     }
 
-    return res.status(200).json({ success: true, data: { selectedCategory } });
+    const category = selectedCategory.toObject();
+    category.courses = selectedCategory.courses.map((course) => ({
+      ...toCourseCard(course),
+      category: { _id: selectedCategory._id, name: selectedCategory.name },
+    }));
+
+    return res.status(200).json({ success: true, data: { selectedCategory: category } });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: "Could not fetch category page details" });

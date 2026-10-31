@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { getUserDetails } from '../../services/operations/profileAPI'
+import Avatar from "../common/Avatar";
 
 // one label + value; shows "Add <label>" in gray when empty
 const Field = ({ label, value }) => (
@@ -27,7 +28,7 @@ const MyProfile = () => {
       {/* Card 1: avatar, name, email */}
       <div className="card mb-6 flex flex-wrap items-center justify-between gap-4 p-6">
         <div className="flex min-w-0 items-center gap-4">
-          <img src={user?.image} alt="Your profile picture" className="size-16 shrink-0 rounded-full object-cover sm:size-20" />
+          <Avatar src={user?.image} firstName={user?.firstName} lastName={user?.lastName} className="size-16 text-xl sm:size-20 sm:text-2xl" alt="Your profile picture" />
           <div className="min-w-0">
             <p className="text-lg font-semibold">{user?.firstName} {user?.lastName}</p>
             <p className="truncate text-slate-500">{user?.email}</p>

@@ -6,6 +6,7 @@ import { apiConnector } from "../services/apiConnector";
 import { categoriesEndpoints } from "../services/api";
 import { toSlug } from "../utils/slug";
 import Logo from "./common/Logo";
+import Avatar from "./common/Avatar";
 
 const Navbar = () => {
   const token = useSelector((state) => state.auth.token);
@@ -33,13 +34,7 @@ const Navbar = () => {
     dispatch(logout(navigate));
   };
 
-  const avatar = user?.image ? (
-    <img src={user.image} alt="Your profile picture" className="w-8 h-8 rounded-full object-cover" />
-  ) : (
-    <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-semibold">
-      {user?.firstName?.[0] || "?"}
-    </div>
-  );
+  const avatar = <Avatar src={user?.image} firstName={user?.firstName} lastName={user?.lastName} className="size-8 text-sm" alt="Your profile picture" />;
 
   return (
     <nav className="sticky top-0 z-40 h-[57px] border-b bg-white/90 px-4 backdrop-blur md:px-6 flex items-center justify-between">

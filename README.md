@@ -63,7 +63,7 @@ cd server && npm install
 npm run dev:memory          # API on :4000 with a throwaway in-memory database
 ```
 
-This seeds categories and a dev admin: `admin@skillora.dev` / `Admin1234`. Data is lost when the process stops.
+This seeds categories, a dev admin (`admin@skillora.dev` / `Admin1234`) and 12 demo courses with instructors, students and reviews (all demo accounts use password `Demo1234`, for example `aarav.mehta@skillora.dev` as an instructor and `ananya.rao@skillora.dev` as a student). Data is lost when the process stops.
 
 **Option B: use your own MongoDB**
 
@@ -142,6 +142,7 @@ Notes:
 | `npm run dev:memory` | server | API with in-memory MongoDB, seeded |
 | `npm start` | server | Production start |
 | `npm run seed` | server | Create default categories and the admin |
+| `npm run seed:demo` | server | Add demo courses, instructors, students and reviews (for demos only, not production) |
 | `npm run dev` / `build` / `lint` | client | Vite dev server, production build, oxlint |
 
 ## Roadmap

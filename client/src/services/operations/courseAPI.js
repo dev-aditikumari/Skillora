@@ -148,14 +148,23 @@ export const fetchInstructorStats = async () => {
 };
 
 
-export const fetchPublishedCourses = async () => {
+export const fetchPublishedCourses = async (limit = 24) => {
   let result = [];
   try {
-    const response = await apiConnector("GET", PUBLISHED_COURSES_API);
+    const response = await apiConnector("GET", PUBLISHED_COURSES_API, null, null, { limit });
     if (!response.data.success) throw new Error(response.data.message);
     result = response.data.data;
   } catch (error) {
     console.error("Could not load courses", error);
   }
   return result;
+};
+export const fetchPublicStats = async () => {
+  try {
+    const response = await apiConnector("GET", courseEndpoints.PUBLIC_STATS_API);
+    return response.data.data;
+  } catch (error) {
+    console.error("Could not load platform stats", error);
+    return null;
+  }
 };

@@ -25,6 +25,7 @@ const {
   markLectureComplete,
   getInstructorStats,
   getPublishedCourses,
+  getPublicStats,
 } = require("../controllers/Course");
 
 // Categories
@@ -53,5 +54,6 @@ router.post("/full-course-details", auth, isStudent, getFullCourseDetails);
 router.post("/update-progress", auth, isStudent, markLectureComplete);
 router.get("/instructor-stats", auth, isInstructor, getInstructorStats);
 router.get("/published-courses", getPublishedCourses); // public
+router.get("/public-stats", getPublicStats); // public
 
 module.exports = router;

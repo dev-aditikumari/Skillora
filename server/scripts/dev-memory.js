@@ -11,6 +11,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
   process.env.ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@skillora.dev";
   process.env.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin1234";
   await require("./seed")();
+  await require("./seed-demo")();
   console.log(`Dev admin login: ${process.env.ADMIN_EMAIL} / ${process.env.ADMIN_PASSWORD}`);
   await require("../index").start();
   process.on("exit", () => mongod.stop());

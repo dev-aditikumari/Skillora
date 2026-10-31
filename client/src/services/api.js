@@ -41,6 +41,7 @@ export const courseEndpoints = {
   UPDATE_PROGRESS_API: BASE_URL + "/course/update-progress",    
   GET_INSTRUCTOR_STATS_API: BASE_URL + "/course/instructor-stats",
   PUBLISHED_COURSES_API: BASE_URL + "/course/published-courses",
+  PUBLIC_STATS_API: BASE_URL + "/course/public-stats",
 };
 
 export const paymentEndpoints = {
