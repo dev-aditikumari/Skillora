@@ -603,18 +603,3 @@ exports.getPublishedCourses = async (req, res) => {
     return res.status(500).json({ success: false, message: "Could not fetch courses" });
   }
 };
-
-exports.getPublicStats = async (req, res) => {
-  try {
-    const [courses, students, instructors, categories] = await Promise.all([
-      Course.countDocuments({ status: "Published" }),
-      User.countDocuments({ accountType: "Student" }),
-      User.countDocuments({ accountType: "Instructor" }),
-      Category.countDocuments(),
-    ]);
-    return res.status(200).json({ success: true, data: { courses, students, instructors, categories } });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: "Could not fetch platform stats" });
-  }
-};
