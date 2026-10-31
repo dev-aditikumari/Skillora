@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchEnrolledCourses } from "../../services/operations/profileAPI";
 import Spinner from "../../components/common/Spinner";
+import { plural } from "../../utils/plural";
 
 const EnrolledCourses = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const EnrolledCourses = () => {
                 <p className="text-xs text-gray-500 mt-1">
                   by {course.instructor.firstName} {course.instructor.lastName}
                   {" · "}
-                  {totalLectures} lectures
+                  {plural(totalLectures, "lecture")}
                 </p>
                 {totalLectures === 0 ? (
   <p className="text-xs text-gray-400 mt-2">No lectures yet</p>
@@ -69,7 +70,7 @@ const EnrolledCourses = () => {
       />
     </div>
     <p className="text-xs text-gray-500 mt-1">
-      {completedLectures} of {totalLectures} lectures · {progressPercentage}%
+      {completedLectures} of {plural(totalLectures, "lecture")} · {progressPercentage}%
     </p>
   </div>
 )}

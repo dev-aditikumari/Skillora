@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchInstructorCourses, deleteCourse } from "../../services/operations/courseAPI";
 import Spinner from "../../components/common/Spinner";
+import { plural } from "../../utils/plural";
 
 const MyCourses = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const MyCourses = () => {
             </span>
 
             <p className="w-20">₹{course.price}</p>
-            <p className="w-24 text-sm text-gray-600">{course.courseContent.length} sections</p>
+            <p className="w-24 text-sm text-gray-600">{plural(course.courseContent.length, "section")}</p>
 
             <button
               onClick={() => navigate(`/dashboard/edit-course/${course._id}`)}

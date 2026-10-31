@@ -10,6 +10,7 @@ import InstructorCard from "../components/course/InstructorCard";
 import StarRating from "../components/course/StarRating";
 import ReviewList from "../components/course/ReviewList";
 import Spinner from "../components/common/Spinner";
+import { plural } from "../utils/plural";
 
 const CourseDetails = () => {
   const { courseId } = useParams();
@@ -94,7 +95,7 @@ const CourseDetails = () => {
         <p>{course.courseDescription}</p>
 
         <p className="text-sm text-gray-600">
-          {course.studentsEnrolledCount} students enrolled · {course.courseContent.length} sections · {totalLectures} lectures
+          {plural(course.studentsEnrolledCount, "student")} enrolled · {plural(course.courseContent.length, "section")} · {plural(totalLectures, "lecture")}
         </p>
         <p>Created by {instructorName}</p>
 
