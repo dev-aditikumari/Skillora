@@ -76,7 +76,7 @@ const handleDeleteLecture = async (sectionId, subSectionId) => {
   if (updatedCourse) setCourse(updatedCourse);
 };
 
-// 125.4 (seconds, as a string) → "2:05"
+// turns seconds like 125.4 into "2:05"
 const formatDuration = (seconds) => {
   const total = Math.round(Number(seconds));
   if (!total) return "";

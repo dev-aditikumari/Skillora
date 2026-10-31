@@ -9,8 +9,8 @@ const DeleteAccount = () => {
 
  const handleDelete = () => {
     const sure = window.confirm("Delete your account? This cannot be undone.")
-    if (!sure) return                 // ← stop if the user clicked Cancel
-    dispatch(deleteProfile(navigate))                   // ← call deleteProfile, it needs navigate
+    if (!sure) return
+    dispatch(deleteProfile(navigate))
   }
 
   return (
