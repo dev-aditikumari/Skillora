@@ -1,5 +1,14 @@
 import axios from "axios";
 
+// The API runs on a free host that sleeps when idle and takes ~30s to wake.
+// Poke it as soon as the app opens so it is awake by the time someone logs in.
+try {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (apiUrl) fetch(new URL(apiUrl).origin + "/", { mode: "no-cors" }).catch(() => {});
+} catch {
+  // a malformed VITE_API_URL only loses the warm-up
+}
+
 const axiosInstance = axios.create({
   withCredentials: true,
   timeout: 60000, // lecture uploads are the slow path, everything else is quick
@@ -27,6 +36,9 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (!error.response && error.code !== "ERR_CANCELED") {
+      error.message = "The server is waking up (free hosting). Please try again in about 30 seconds.";
+    }
     const status = error.response?.status;
     const url = error.config?.url || "";
     // a 401 from these means "wrong password or code", not "your session expired"
