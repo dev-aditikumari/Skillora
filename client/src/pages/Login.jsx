@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/operations/authAPI";
 import AuthLayout, { inputClass, primaryButton } from "../components/auth/AuthLayout";
+import DemoCredentials from "../components/auth/DemoCredentials";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -38,6 +39,8 @@ const Login = () => {
         </>
       }
     >
+      <DemoCredentials onUse={(a) => setFormData({ email: a.email, password: a.password })} />
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1 text-sm font-medium text-gray-700">
           Email

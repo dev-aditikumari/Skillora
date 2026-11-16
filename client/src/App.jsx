@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 
 import Navbar from './components/Navbar'
 import Footer from './components/common/Footer'
+import GitHubCorner from './components/GitHubCorner'
 import OpenRouter from './components/auth/OpenRouter'
 import PrivateRouter from './components/auth/PrivateRouter'
 import RoleRouter from './components/auth/RoleRouter'
@@ -32,6 +33,7 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+      <GitHubCorner />
 
       <div className="flex flex-1 flex-col [&>*]:w-full">
       <Routes>
